@@ -95,6 +95,24 @@ class ConferenceApi(remote.Service):
 
 # - - - Conference objects - - - - - - - - - - - - - - - - -
 
+    # return all sessions of a conference
+    def getConferenceSessions(websafeConferenceKey):
+        return allSessions
+
+    # return  all conference sessions by type
+    def getConferenceSessionsByType(websafeConferenceKey,typeOfSession)​:
+        return allSessionsType
+
+    # return all sessions by speak across all conferences
+    def getSessionsBySpeaker(speaker):
+        return allSessions
+
+    # create session, open only to organizer of conference
+    def createSession(SessionForm,websafeConferenceKey):
+
+
+
+
     def _copyConferenceToForm(self, conf, displayName):
         """Copy relevant fields from Conference to ConferenceForm."""
         cf = ConferenceForm()
