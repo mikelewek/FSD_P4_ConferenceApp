@@ -10,9 +10,10 @@ This application...
 
 ###How to Run the Application
 -------------------------
-<p>Python 2.7 must be installed and configured.</p>
+<p>Python 2.7 and the endpoints module must be installed and configured.</p>
 
 <pre>
+    <code>$ pip install endpoints</code>
 	<code>$ git clone https://github.com/mikelewek/FSD_P4_ConferenceApp.git</code>
 	<code>$ cd FSD_P4_ConferenceApp</code>
 </pre>
