@@ -36,6 +36,8 @@ from models import ConferenceForms
 from models import ConferenceQueryForm
 from models import ConferenceQueryForms
 from models import TeeShirtSize
+from models import Session
+from models import SessionForm
 
 from settings import WEB_CLIENT_ID
 from settings import ANDROID_CLIENT_ID
@@ -94,24 +96,6 @@ class ConferenceApi(remote.Service):
     """Conference API v0.1"""
 
 # - - - Conference objects - - - - - - - - - - - - - - - - -
-
-    # return all sessions of a conference
-    def getConferenceSessions(websafeConferenceKey):
-        return allSessions
-
-    # return  all conference sessions by type
-    def getConferenceSessionsByType(websafeConferenceKey,typeOfSession)​:
-        return allSessionsType
-
-    # return all sessions by speak across all conferences
-    def getSessionsBySpeaker(speaker):
-        return allSessions
-
-    # create session, open only to organizer of conference
-    def createSession(SessionForm,websafeConferenceKey):
-
-
-
 
     def _copyConferenceToForm(self, conf, displayName):
         """Copy relevant fields from Conference to ConferenceForm."""
@@ -567,6 +551,28 @@ class ConferenceApi(remote.Service):
         return ConferenceForms(
             items=[self._copyConferenceToForm(conf, "") for conf in q]
         )
+
+# - - - Session - - - - - - - - - - - - - - - - - - -
+    # return all sessions of a conference
+    @endpoints.method(CONF_GET_REQUEST, SessionForm,
+            path='conference/{websafeConferenceKey}/sessions',
+            http_method='GET')
+    def getConferenceSessions(self, request):
+
+       return SessionForm(
+            items=[self._copyConferenceToForm(conf, "") for conf in q]
+       )
+
+    # return  all conference sessions by type
+    # def getConferenceSessionsByType(websafeConferenceKey,typeOfSession)​:
+    #    return allSessionsType
+    #
+    # # return all sessions by speaker across all conferences
+    # def getSessionsBySpeaker(speaker):
+    #    return allSessions
+    #
+    # # create session, open only to organizer of conference
+    # def createSession(SessionForm,websafeConferenceKey):
 
 
 api = endpoints.api_server([ConferenceApi]) # register API
