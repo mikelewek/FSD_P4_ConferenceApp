@@ -8,8 +8,8 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
  2. README.md
  
  
- ###Requirements
- --------------------
+###Requirements
+--------------------
  1. The user must have a Google account.
  2. The user must create a new project in the Google Developer's Console and copy over the following: The application name must be changed in app.yaml. The CLIENT_ID must be changed in static/js/app.js.
  3. Google App Engine SDK is required to test and deploy to the app engine production environment. [https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
