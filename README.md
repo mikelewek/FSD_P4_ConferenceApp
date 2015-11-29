@@ -1,23 +1,28 @@
 ##Conference Organization App. - FSD Project 4
 
-This application...
+This application uses Google Cloud API's, OAuth, and Endpoints for a Conference App. Users can edit their profile, create and register conferences, view conferences, conference details, and which conferences a user has created and attended.
 
 ###The Repo. Contains the Following Files
 -------------------------------------
- 1. xxx.py - Contains...
- 2. ...provided by Udacity.
+ 1. /ud858/ConferenceCentral_Complete - Files were provided by Udacity and modified for the Lesson to implement additional functionality as explained in the Tasks below.
  x. README.md
-
+ 
+ ###Requirements
+ --------------------
+ 1. The user must have a Google account.
+ 2. The user must create a new project in the Google Developer's Console and copy over the following: The application name must be changed in app.yaml. The CLIENT_ID must be changed in static/js/app.js.
+ 3. Google App Engine SDK is required to test and deploy to the app engine production environment. [https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
+  
 ###How to Run the Application
 -------------------------
-<p>Python 2.7 and the endpoints module must be installed and configured.</p>
+<p>Python 2.7, the endpoints module, and GoogleAppEngineLauncher must be installed and configured.</p>
 
 <pre>
     <code>$ pip install endpoints</code>
 	<code>$ git clone https://github.com/mikelewek/FSD_P4_ConferenceApp.git</code>
-	<code>$ cd FSD_P4_ConferenceApp</code>
+	<code></code>
 </pre>
 
 ###Task 1 - Explanation of Design Choices
-I created the Session class, SessionForm class, and Endpoints, passing in required variables in the project outline as well as the websafeConferenceKey.
-An Endpoint and function was created to get all sessions (getConferenceSessions). The CONF_GET_REQUEST is set as the request message class and SessionForm is set as the response message class. 
+The Session class, SessionForm class, and Endpoints were created, utilizing required variables in the project outline.
+An Endpoint and function was created to get all sessions (getConferenceSessions). The CONF_GET_REQUEST is set as the request message class and SessionForm is set as the response message class. Sessions are queried and a SessionForm message object is returned containing all sessions. If memcache contains the key, the data is returned from cache, otherwise it queries the datastore. 
