@@ -553,26 +553,40 @@ class ConferenceApi(remote.Service):
         )
 
 # - - - Session - - - - - - - - - - - - - - - - - - -
-    # return all sessions of a conference
     @endpoints.method(CONF_GET_REQUEST, SessionForm,
             path='conference/{websafeConferenceKey}/sessions',
             http_method='GET')
     def getConferenceSessions(self, request):
+        """
+        Get all conference sessions
+        Check memcache for stored data by key or retrieve from datastore
+        """
+        conference_key = ndb.Key(urlsafe=request.websafeConferenceKey)
 
-       return SessionForm(
-            items=[self._copyConferenceToForm(conf, "") for conf in q]
-       )
+        data = memcache.get(request.websafeConferenceKey)
+        if data is not None:
+            conference_sessions = data
+        else:
+            conference_sessions = Session.query(ancestor=conference_key)
 
-    # return  all conference sessions by type
-    # def getConferenceSessionsByType(websafeConferenceKey,typeOfSession)​:
-    #    return allSessionsType
-    #
-    # # return all sessions by speaker across all conferences
-    # def getSessionsBySpeaker(speaker):
-    #    return allSessions
-    #
-    # # create session, open only to organizer of conference
-    # def createSession(SessionForm,websafeConferenceKey):
+        return SessionForm(
+            items=[self.aggregate_sessions(session) for session in conference_sessions]
+        )
+
+    def aggregate_sessions(self, session):
+        """run through sessions query and return as a SessionForm object"""
+
+        session_form = SessionForm()
+        for field in session_form.all_fields():
+            if hasattr(session, field.name):
+                # set fields - convert date and startTime to strings
+                if field.name.endswith('date'):
+                    setattr(session_form, field.name, str(getattr(session, field.name)))
+                elif field.name == 'startTime':
+                    setattr(session_form, field.name, str(getattr(session, field.name)))
+                else:
+                    setattr(session_form, field.name, getattr(session, field.name))
+        return session_form
 
 
 api = endpoints.api_server([ConferenceApi]) # register API

@@ -130,7 +130,6 @@ class Session(ndb.Model):
     typeOfSession           = ndb.StringProperty(repeated=True)
     date                    = ndb.DateProperty()
     startTime               = ndb.TimeProperty()
-    websafeConferenceKey    = ndb.StringProperty()
 
 class SessionForm(messages.Message):
     """SessionForm message"""
@@ -141,4 +140,3 @@ class SessionForm(messages.Message):
     typeOfSession           = messages.StringField(5, repeated=True)
     date                    = messages.StringField(6)
     startTime               = messages.StringField(7)
-    websafeConferenceKey    = messages.StringField(8)
