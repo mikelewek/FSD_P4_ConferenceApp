@@ -5,7 +5,8 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 ###The Repo. Contains the Following Files
 -------------------------------------
  1. /ud858/ConferenceCentral_Complete - Files were provided by Udacity and modified for the Lesson to implement additional functionality as explained in the Tasks below.
- x. README.md
+ 2. README.md
+ 
  
  ###Requirements
  --------------------
@@ -23,6 +24,8 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 	<code></code>
 </pre>
 
-###Task 1 - Explanation of Design Choices
+###Task #1 - Explanation of Design Choices
 The Session class, SessionForm class, and Endpoints were created, utilizing required variables in the project outline.
 An Endpoint and function was created to get all sessions (getConferenceSessions). The CONF_GET_REQUEST is set as the request message class and SessionForm is set as the response message class. Sessions are queried and a SessionForm message object is returned containing all sessions. If memcache contains the key, the data is returned from cache, otherwise it queries the datastore. 
+All sessions by type (getConferenceSessionsByType) uses CONF_GET_TYPE_REQUEST as the request message class. Sessions are queried and managed with memcache, mirroring the previous function.
+All sessions by speaker (getSessionsBySpeaker) uses CONF_GET_SPEAKER_REQUEST as the request message class. Sessions are queried, replicating the previous two functions, if cache data is not available.
