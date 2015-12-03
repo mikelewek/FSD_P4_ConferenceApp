@@ -123,7 +123,7 @@ class ConferenceQueryForms(messages.Message):
 
 class Session(ndb.Model):
     """Session object"""
-    name                    = ndb.StringProperty(required=True)
+    sessionName                    = ndb.StringProperty(required=True)
     highlights              = ndb.StringProperty()
     speaker                 = ndb.StringProperty()
     duration                = ndb.StringProperty()
@@ -131,20 +131,18 @@ class Session(ndb.Model):
     date                    = ndb.DateProperty()
     startTime               = ndb.TimeProperty()
     speakerKey              = ndb.StringProperty()
-    websafeKey           = ndb.StringProperty()
 
 
 class SessionForm(messages.Message):
     """SessionForm message"""
-    name                    = messages.StringField(1)
+    sessionName             = messages.StringField(1)
     highlights              = messages.StringField(2)
-    speaker                 = messages.StringField(3)
-    duration                = messages.StringField(4)
-    typeOfSession           = messages.StringField(5)
-    date                    = messages.StringField(6)
-    startTime               = messages.StringField(7)
-    websafeKey           = messages.StringField(8)
-
+    duration                = messages.StringField(3)
+    typeOfSession           = messages.StringField(4)
+    date                    = messages.StringField(5)
+    startTime               = messages.StringField(6)
+    speakerKey              = messages.StringField(7)
+    conferenceKey           = messages.StringField(8)
 
 class SessionForms(messages.Message):
     """SessionForms -- multiple Session form message"""
@@ -154,9 +152,17 @@ class SessionForms(messages.Message):
 class Speaker(ndb.Model):
     """Speaker object"""
     displayName = ndb.StringProperty(required=True)
+    biography = ndb.StringProperty()
 
 
 class SpeakerForm(messages.Message):
     """SpeakerForm message"""
     displayName = messages.StringField(1)
-    speaker = messages.StringField(2)
+    profileKey = messages.StringField(2)
+    biography = messages.StringField(3)
+    websafeKey = messages.StringField(4)
+
+
+class SpeakerForms(messages.Message):
+    """SpeakerForm -- multiple Speaker outbound form message"""
+    items = messages.MessageField(SpeakerForm, 1, repeated=True)
