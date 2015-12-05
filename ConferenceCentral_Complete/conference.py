@@ -588,27 +588,42 @@ class ConferenceApi(remote.Service):
         return self._createSessionObject(request)
 
     def _createSessionObject (self, request):
-        """ Verify user is authed or throw error """
+        """internal function to create session object"""
+
+        # Verify user is authed or error
         user = endpoints.get_current_user()
         if not user:
             raise endpoints.UnauthorizedException('Authorization required')
 
-        # validate sessionName
+        # verify session name was recieved
         if not request.sessionName:
             raise endpoints.BadRequestException(
                 "Session name is required")
 
+        # verify conference exists for session add
         conf = ndb.Key(urlsafe=request.conferenceKey)
-
         if not conf:
             raise endpoints.NotFoundException(
                 'No conference found with key: %s' % request.conferenceKey)
 
+        # logging.error("eeXXXXXXXXXX - conFparent %s", conf.parent())
+        # verify user is conference organizer
         if conf.parent() != ndb.Key(Profile, getUserId(user)):
             raise endpoints.ForbiddenException(
                 'You must be the conference organizer to create'
                 'sessions for this conference.'
             )
+
+        @endpoints.method(CONF_GET_SPEAKER_REQUEST, SessionForms,
+                      path='sessions/{speaker}',
+                      http_method='POST')
+        def getSessionsBySpeaker(self, request):
+            """Get session by speaker"""
+            speaker = request.speaker
+
+            return SessionForms(
+                items=[self._copySessionToForm(sess)
+                       for sess in conferenceSessions])
 
         # copy SessionForm Message into dict
         data = {field.name: getattr(request, field.name)
@@ -624,23 +639,21 @@ class ConferenceApi(remote.Service):
             data['startTime'] = datetime.strptime(
                 data['startTime'], "%H:%M").time()
 
-        # generate Conf Key
+        # get conference
         websafe_conference_key = request.conferenceKey
         conf_key = ndb.Key(urlsafe=websafe_conference_key)
-
-        # get the conference entity
         conf = conf_key.get()
 
-        # if not found, raise an error and abort
+        # if not found, raise an exception and abort
         if not conf:
             raise endpoints.NotFoundException(
                 'No conference found with key: %s' % websafe_conference_key)
 
         # create a unique session ID
-        s_id = Session.allocate_ids(size=1, parent=conf_key)[0]
+        session_id = Session.allocate_ids(size=1, parent=conf_key)[0]
 
-        # create a key from the ID and save it to the dictionary
-        s_key = ndb.Key(Session, s_id, parent=conf_key)
+        # create a key from the ID and add it to dict object
+        s_key = ndb.Key(Session, session_id, parent=conf_key)
         data['key'] = s_key
 
         # create Session & save to Datastore
