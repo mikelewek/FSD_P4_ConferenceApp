@@ -87,7 +87,7 @@ CONF_GET_REQUEST = endpoints.ResourceContainer(
 
 CONF_GET_TYPE_REQUEST = endpoints.ResourceContainer(
     message_types.VoidMessage,
-    websafeConferenceKey=messages.StringField(1),
+    websafeConferenceKey=messages.StringField(1, required=True),
     typeOfSession=messages.StringField(2),
 )
 
@@ -614,17 +614,6 @@ class ConferenceApi(remote.Service):
                 'sessions for this conference.'
             )
 
-        @endpoints.method(CONF_GET_SPEAKER_REQUEST, SessionForms,
-                      path='sessions/{speaker}',
-                      http_method='POST')
-        def getSessionsBySpeaker(self, request):
-            """Get session by speaker"""
-            speaker = request.speaker
-
-            return SessionForms(
-                items=[self._copySessionToForm(sess)
-                       for sess in conferenceSessions])
-
         # copy SessionForm Message into dict
         data = {field.name: getattr(request, field.name)
                 for field in request.all_fields()}
@@ -664,6 +653,30 @@ class ConferenceApi(remote.Service):
         ## TODO : set featured speaker
         ##
         return self._copySessionToForm(s_key.get())
+
+    @endpoints.method(CONF_GET_TYPE_REQUEST, SessionForms,
+            path='conference/{websafeConferenceKey}/sessions/type/{typeOfSession}',
+            http_method='GET')
+    def getConferenceSessionsByType(self, request):
+        """Get sessions by type"""
+
+        # verify type is received and set into dict
+        data = {field.name: getattr(request, field.name) for field in request.all_fields()}
+        type_of_session = data['typeOfSession']
+
+        # verify conference key is received and exists
+        conference = ndb.Key(urlsafe=request.websafeConferenceKey).get()
+        if not conference:
+            raise endpoints.NotFoundException(
+                'Conference not found with key: %s' % request.websafeConferenceKey)
+
+        sessions = Session.query(Session.typeOfSession == type_of_session,
+                                 ancestor=ndb.Key(Conference, conference.key.id()))
+
+        # return sessions obj
+        return SessionForms(
+            items=[self._copySessionToForm(session) for session in sessions]
+        )
 
     @endpoints.method(SESSIONS_GET_REQUEST, SessionForms,
                       path='getConferenceSessions/{conferenceKey}',
