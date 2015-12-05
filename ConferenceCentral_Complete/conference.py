@@ -606,7 +606,6 @@ class ConferenceApi(remote.Service):
             raise endpoints.NotFoundException(
                 'No conference found with key: %s' % request.conferenceKey)
 
-        # logging.error("eeXXXXXXXXXX - conFparent %s", conf.parent())
         # verify user is conference organizer
         if conf.parent() != ndb.Key(Profile, getUserId(user)):
             raise endpoints.ForbiddenException(
@@ -660,9 +659,10 @@ class ConferenceApi(remote.Service):
     def getConferenceSessionsByType(self, request):
         """Get sessions by type"""
 
-        # verify type is received and set into dict
-        data = {field.name: getattr(request, field.name) for field in request.all_fields()}
-        type_of_session = data['typeOfSession']
+        # verify type is received
+        if not request.typeOfSession:
+            raise endpoints.NotFoundException(
+                'Conference not found with key: %s' % request.typeOfSession)
 
         # verify conference key is received and exists
         conference = ndb.Key(urlsafe=request.websafeConferenceKey).get()
@@ -670,12 +670,15 @@ class ConferenceApi(remote.Service):
             raise endpoints.NotFoundException(
                 'Conference not found with key: %s' % request.websafeConferenceKey)
 
-        sessions = Session.query(Session.typeOfSession == type_of_session,
+        sessions = Session.query(Session.typeOfSession == request.typeOfSession,
                                  ancestor=ndb.Key(Conference, conference.key.id()))
-
+        tt = SessionForms(
+            items=[self._copySessionToForm(sess) for sess in sessions]
+        )
+        logging.error("eeXXXXXXXXXX - sessionshere - %s", tt)
         # return sessions obj
         return SessionForms(
-            items=[self._copySessionToForm(session) for session in sessions]
+            items=[self._copySessionToForm(sess) for sess in sessions]
         )
 
     @endpoints.method(SESSIONS_GET_REQUEST, SessionForms,
@@ -686,6 +689,7 @@ class ConferenceApi(remote.Service):
         websafeConferenceKey = request.conferenceKey
         conference_key = ndb.Key(urlsafe=websafeConferenceKey)
         conferenceSessions = Session.query(ancestor=conference_key)
+
         return SessionForms(
             items=[self._copySessionToForm(sess)
                    for sess in conferenceSessions]
@@ -693,6 +697,8 @@ class ConferenceApi(remote.Service):
 
     def _copySessionToForm(self, session):
         """run through sessions query and return as a SessionForm object"""
+        logging.error("eeXXXXXXXXXX - sessions - %s", session)
+
         session_form = SessionForm()
         for field in session_form.all_fields():
             if hasattr(session, field.name):
