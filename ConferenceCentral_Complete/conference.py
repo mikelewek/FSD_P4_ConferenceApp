@@ -659,23 +659,17 @@ class ConferenceApi(remote.Service):
     def getConferenceSessionsByType(self, request):
         """Get sessions by type"""
 
-        # verify type is received
-        if not request.typeOfSession:
-            raise endpoints.NotFoundException(
-                'Conference not found with key: %s' % request.typeOfSession)
+        # get conference by websafeConferenceKey
+        conference = ndb.Key(urlsafe=request.websafeConferenceKey)
 
-        # verify conference key is received and exists
-        conference = ndb.Key(urlsafe=request.websafeConferenceKey).get()
-        if not conference:
-            raise endpoints.NotFoundException(
-                'Conference not found with key: %s' % request.websafeConferenceKey)
-
+        # get conference if it exists and verify type exists
+        if not request.typeOfSession and not conference:
+            raise endpoints.NotFoundException('Conference not found '
+                                              'with key: %s' % request.typeOfSession)
+        
         sessions = Session.query(Session.typeOfSession == request.typeOfSession,
-                                 ancestor=ndb.Key(Conference, conference.key.id()))
-        tt = SessionForms(
-            items=[self._copySessionToForm(sess) for sess in sessions]
-        )
-        logging.error("eeXXXXXXXXXX - sessionshere - %s", tt)
+                                 ancestor=conference)
+
         # return sessions obj
         return SessionForms(
             items=[self._copySessionToForm(sess) for sess in sessions]
