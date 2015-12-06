@@ -42,6 +42,7 @@ from models import SessionForm
 from models import SessionForms
 from models import Speaker
 from models import SpeakerForm
+from models import SpeakerForms
 
 from settings import WEB_CLIENT_ID
 from settings import ANDROID_CLIENT_ID
@@ -105,7 +106,7 @@ SESSIONS_POST_REQUEST = endpoints.ResourceContainer(
 CONF_GET_SPEAKER_REQUEST = endpoints.ResourceContainer(
     message_types.VoidMessage,
     websafeConferenceKey=messages.StringField(1),
-    speaker=messages.StringField(2),
+    speakerKey=messages.StringField(2),
 )
 
 CONF_POST_REQUEST = endpoints.ResourceContainer(
@@ -600,11 +601,12 @@ class ConferenceApi(remote.Service):
             raise endpoints.BadRequestException(
                 "Session name is required")
 
-        # verify conference exists for session add
+        # verify conference and session exist
         conf = ndb.Key(urlsafe=request.conferenceKey)
-        if not conf:
+        if not conf or not request.sessionName:
             raise endpoints.NotFoundException(
-                'No conference found with key: %s' % request.conferenceKey)
+                'No conference or sessionName found: %s - %s' %
+                (request.conferenceKey, request.sessionName))
 
         # verify user is conference organizer
         if conf.parent() != ndb.Key(Profile, getUserId(user)):
@@ -662,11 +664,11 @@ class ConferenceApi(remote.Service):
         # get conference by websafeConferenceKey
         conference = ndb.Key(urlsafe=request.websafeConferenceKey)
 
-        # get conference if it exists and verify type exists
-        if not request.typeOfSession and not conference:
-            raise endpoints.NotFoundException('Conference not found '
-                                              'with key: %s' % request.typeOfSession)
-        
+        # get sessions if conference and type exists
+        if not request.typeOfSession or not conference:
+            raise endpoints.NotFoundException('Conference or type not found: %s - %s' %
+                                              (conference, request.typeOfSession))
+
         sessions = Session.query(Session.typeOfSession == request.typeOfSession,
                                  ancestor=conference)
 
@@ -690,9 +692,10 @@ class ConferenceApi(remote.Service):
         )
 
     def _copySessionToForm(self, session):
-        """run through sessions query and return as a SessionForm object"""
-        logging.error("eeXXXXXXXXXX - sessions - %s", session)
+        """utility function to run through sessions query
+        and return as a SessionForm object"""
 
+        # create SessionForm obj from fields
         session_form = SessionForm()
         for field in session_form.all_fields():
             if hasattr(session, field.name):
@@ -714,5 +717,20 @@ class ConferenceApi(remote.Service):
     def addSpeaker(self, request):
         """Create a new speaker"""
         return self._createSpeakerObject(request)
+
+    @endpoints.method(CONF_GET_SPEAKER_REQUEST, SessionForms,
+            path='getConferenceSessions/type/{speakerKey}',
+            http_method='GET')
+    def getSessionsBySpeaker(self, request):
+        """Get sessions by type with speakerKey"""
+
+        speaker_key = request.speakerKey
+        speaker = ndb.Key(urlsafe=speaker_key)
+        speaker_sessions = Session.query(ancestor=speaker)
+
+        return SessionForms(
+            items=[self._copySessionToForm(sess)
+                   for sess in speaker_sessions]
+        )
 
 api = endpoints.api_server([ConferenceApi]) # register API
