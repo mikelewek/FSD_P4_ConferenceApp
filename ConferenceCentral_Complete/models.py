@@ -123,7 +123,7 @@ class ConferenceQueryForms(messages.Message):
 
 class Session(ndb.Model):
     """Session object"""
-    sessionName                    = ndb.StringProperty(required=True)
+    sessionName             = ndb.StringProperty(required=True)
     highlights              = ndb.StringProperty()
     speaker                 = ndb.StringProperty()
     duration                = ndb.StringProperty()
@@ -159,10 +159,4 @@ class SpeakerForm(messages.Message):
     """SpeakerForm message"""
     displayName = messages.StringField(1)
     profileKey = messages.StringField(2)
-    biography = messages.StringField(3)
     websafeKey = messages.StringField(4)
-
-
-class SpeakerForms(messages.Message):
-    """SpeakerForm -- multiple Speaker outbound form message"""
-    items = messages.MessageField(SpeakerForm, 1, repeated=True)
