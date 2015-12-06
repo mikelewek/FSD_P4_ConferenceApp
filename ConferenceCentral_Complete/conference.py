@@ -42,7 +42,6 @@ from models import SessionForm
 from models import SessionForms
 from models import Speaker
 from models import SpeakerForm
-from models import SpeakerForms
 
 from settings import WEB_CLIENT_ID
 from settings import ANDROID_CLIENT_ID
@@ -114,8 +113,12 @@ CONF_POST_REQUEST = endpoints.ResourceContainer(
     websafeConferenceKey=messages.StringField(1),
 )
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+WISHLIST_POST_REQUEST = endpoints.ResourceContainer(
+    message_types.VoidMessage,
+    websafeSessionKey=messages.StringField(1, required=True),
+)
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 @endpoints.api(name='conference', version='v1', audiences=[ANDROID_AUDIENCE],
     allowed_client_ids=[WEB_CLIENT_ID, API_EXPLORER_CLIENT_ID, ANDROID_CLIENT_ID, IOS_CLIENT_ID],
@@ -712,12 +715,6 @@ class ConferenceApi(remote.Service):
         return session_form
 
 # - - - Speaker - - - - - - - - - - - - - - - - -
-    @endpoints.method(SpeakerForm, SpeakerForm, path='speaker',
-                      http_method='POST')
-    def addSpeaker(self, request):
-        """Create a new speaker"""
-        return self._createSpeakerObject(request)
-
     @endpoints.method(CONF_GET_SPEAKER_REQUEST, SessionForms,
             path='getConferenceSessions/type/{speakerKey}',
             http_method='GET')
@@ -732,5 +729,41 @@ class ConferenceApi(remote.Service):
             items=[self._copySessionToForm(sess)
                    for sess in speaker_sessions]
         )
+
+# - - - Wishlist - - - - - - - - - - - - - - - - -
+    @endpoints.method(WISHLIST_POST_REQUEST, SessionForm,
+                      path='addsessiontowishlist', http_method='POST')
+    def addSessionToWishlist(self, request):
+        """Save session to user's profile wishlist"""
+
+        # make sure user is authed
+        #user = endpoints.get_current_user()
+        #if not user:
+        #    raise endpoints.UnauthorizedException('Authorization required')
+        #user_id = getUserId(user)
+
+        # get session
+        session = ndb.Key(urlsafe=request.websafeSessionKey).get()
+        if not session:
+            raise endpoints.NotFoundException(
+                'No session found with key: %s' % request.websafeSessionKey)
+
+        logging.error("xxxxxXxxxxxxxsesskey - %s", session)
+
+        profile = self._getProfileFromUser()
+        logging.error("xxxxxXxxxxxxxprofile - %s", profile)
+
+        # verify session is not in wishlist
+        if session.key in profile.wishList:
+            raise endpoints.BadRequestException(
+                'Session already exists wishlist: %s' % request.websafeSessionKey)
+
+        profile.wishList.append(request.websafeSessionKey)
+
+        # Save the profile back to Datastore
+        profile.put()
+
+        return self._copySessionToForm(session)
+
 
 api = endpoints.api_server([ConferenceApi]) # register API
