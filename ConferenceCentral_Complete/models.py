@@ -142,7 +142,6 @@ class SessionForm(messages.Message):
     startTime               = messages.StringField(6)
     speakerKey              = messages.StringField(7)
     conferenceKey           = messages.StringField(8)
-    websafeKey              = messages.StringField(9)
 
 class SessionForms(messages.Message):
     """SessionForms -- multiple Session form message"""

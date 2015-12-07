@@ -115,7 +115,7 @@ CONF_POST_REQUEST = endpoints.ResourceContainer(
 
 WISHLIST_POST_REQUEST = endpoints.ResourceContainer(
     message_types.VoidMessage,
-    websafeSessionKey=messages.StringField(1, required=True),
+    sessionKey=messages.StringField(1, required=True),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -594,12 +594,12 @@ class ConferenceApi(remote.Service):
     def _createSessionObject (self, request):
         """internal function to create session object"""
 
-        # Verify user is authed or error
+        # verify user is authed or error
         user = endpoints.get_current_user()
         if not user:
             raise endpoints.UnauthorizedException('Authorization required')
 
-        # verify session name was recieved
+        # verify session name from request
         if not request.sessionName:
             raise endpoints.BadRequestException(
                 "Session name is required")
@@ -632,7 +632,7 @@ class ConferenceApi(remote.Service):
             data['startTime'] = datetime.strptime(
                 data['startTime'], "%H:%M").time()
 
-        # get conference
+        # get conference from request
         websafe_conference_key = request.conferenceKey
         conf_key = ndb.Key(urlsafe=websafe_conference_key)
         conf = conf_key.get()
@@ -736,17 +736,16 @@ class ConferenceApi(remote.Service):
     def addSessionToWishlist(self, request):
         """Save session to user's profile wishlist"""
 
-        # make sure user is authed
-        #user = endpoints.get_current_user()
-        #if not user:
-        #    raise endpoints.UnauthorizedException('Authorization required')
-        #user_id = getUserId(user)
+        # verify sure user is authed
+        user = endpoints.get_current_user()
+        if not user:
+            raise endpoints.UnauthorizedException('Authorization required')
 
         # get session
-        session = ndb.Key(urlsafe=request.websafeSessionKey).get()
+        session = ndb.Key(urlsafe=request.sessionKey).get()
         if not session:
             raise endpoints.NotFoundException(
-                'No session found with key: %s' % request.websafeSessionKey)
+                'No session found with key: %s' % request.sessionKey)
 
         logging.error("xxxxxXxxxxxxxsesskey - %s", session)
 
@@ -756,14 +755,63 @@ class ConferenceApi(remote.Service):
         # verify session is not in wishlist
         if session.key in profile.wishList:
             raise endpoints.BadRequestException(
-                'Session already exists wishlist: %s' % request.websafeSessionKey)
+                'Session already exists wishlist: %s' % request.sessionKey)
 
-        profile.wishList.append(request.websafeSessionKey)
+        profile.wishList.append(request.sessionKey)
 
         # Save the profile back to Datastore
         profile.put()
 
         return self._copySessionToForm(session)
 
+    @endpoints.method(WISHLIST_POST_REQUEST, SessionForms,
+                      path='getsessionwishlist', http_method='POST')
+    def getSessionsInWishlist(self, request):
+        """Get sessions in Profile WishList"""
+
+        # verify user is authed
+        user = endpoints.get_current_user()
+        if not user:
+            raise endpoints.UnauthorizedException('User is not authorized')
+
+        # get wishlist sessions from profile
+        profile = self._getProfileFromUser()
+        sessions = profile.wishList
+
+        # get session data and return as SessionForms obj
+        return SessionForms(
+            items=[self._copySessionToForm(ndb.Key(urlsafe=sess).get())
+                   for sess in sessions]
+        )
+
+    @endpoints.method(WISHLIST_POST_REQUEST, BooleanMessage,
+                      path='deletesessionwishlist', http_method='POST')
+    def deleteSessionInWishlist(self, request):
+        """Remove Session from user's wishlist list"""
+
+        is_deleted = False
+
+        # verify sure user is authed
+        user = endpoints.get_current_user()
+        if not user:
+            raise endpoints.UnauthorizedException('Authorization required')
+
+        # get profile
+        profile = self._getProfileFromUser()
+
+        # get session
+        sess = ndb.Key(urlsafe=request.sessionKey).get()
+        if not sess:
+            raise endpoints.NotFoundException(
+                'No Session found with key: %s' % request.sessionKey)
+
+        # remove session from wishlist if exists then save profile
+        if request.sessionKey in profile.wishList:
+            profile.wishList.remove(request.sessionKey)
+        profile.put()
+        is_deleted = True
+
+        # is_deleted is true if session was removed
+        return BooleanMessage(data=is_deleted)
 
 api = endpoints.api_server([ConferenceApi]) # register API
