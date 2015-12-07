@@ -4,16 +4,18 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 
 ###The Repo. Contains the Following Files
 -------------------------------------
- 1. /ud858/ConferenceCentral_Complete - Files were provided by Udacity and modified for the Lesson to implement additional functionality as explained in the Tasks below.
+ 1. /ud858/ConferenceCentral_Complete - Proect files were provided by Udacity and modified for the Lesson to implement additional functionality as explained in the Tasks below.
  2. README.md
  
  
 ###Requirements
 --------------------
  1. The user must have a Google account.
- 2. The user must create a new project in the Google Developer's Console and copy over the following: The application name must be changed in app.yaml. The CLIENT_ID must be changed in static/js/app.js.
+ 2. The user must create a new project in the Google Developer's Console and copy over the following: The application name must be changed in app.yaml. The CLIENT_ID must be changed in static/js/app.js. The WEB_CLIENT_ID must be changed in settings.py.
  3. Google App Engine SDK is required to test and deploy to the app engine production environment. [https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
-  
+ 4. Testing locally can be done through the APIs Explorer: <code>http://localhost:8080/_ah/api/explorer</code>
+ 5. Viewing the data in the Datastore Viewer: <code>http://localhost:8001/datastore?kind=Conference</code>
+ 
 ###How to Run the Application
 -------------------------
 <p>Python 2.7, the endpoints module, and GoogleAppEngineLauncher must be installed and configured.</p>
@@ -27,8 +29,22 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 ###Task #1 - Explanation of Design Choices
 The Session class, SessionForm class, and Endpoints were created, utilizing required variables in the project outline.
 
-An Endpoint and function was created to get all sessions (getConferenceSessions). The CONF_GET_REQUEST is set as the request message class and SessionForm is set as the response message class. Sessions are queried and a SessionForm message object is returned containing all sessions. If memcache contains the key, the data is returned from cache, otherwise it queries the datastore. 
+The Session class properties were added to allow the user to sort by type and speaker.
 
-All sessions by type (getConferenceSessionsByType) uses CONF_GET_TYPE_REQUEST as the request message class. Sessions are queried and managed with memcache, mirroring the previous function.
+An Endpoint and method was created to get all sessions (getConferenceSessions). The CONF_GET_REQUEST is set as the request message class and SessionForm is set as the response message class. Sessions are queried and a SessionForm message object is returned containing all sessions.
 
-All sessions by speaker (getSessionsBySpeaker) uses CONF_GET_SPEAKER_REQUEST as the request message class. Sessions are queried, replicating the previous two functions, if cache data is not available.
+The getConferenceSessionsByType method uses CONF_GET_TYPE_REQUEST as the request message class.
+
+The getSessionsBySpeaker method uses CONF_GET_SPEAKER_REQUEST as the request message class. Sessions are queried, replicating the previous two functions.
+
+###Task #2 - Add Session to Wishlist
+Wishlist endpoints were implemented as required. addSessionToWishlist(SessionKey), getSessionsInWishlist(), deleteSessionInWishlist(SessionKey)
+
+A wishList repeated list property was added to the Profile model class and functionality was added to iterate a user's profile to get, add, or remove sessions from the wishlist if they had authorization.
+
+
+
+--Indexes
+
+
+--Add a taks
