@@ -43,9 +43,10 @@ Wishlist endpoints were implemented as required. addSessionToWishlist(SessionKey
 
 A wishList repeated list property was added to the Profile model class and functionality was added to iterate a user's profile to get, add, or remove sessions from the wishlist if they had authorization.
 
+###Task #3 - Indexes and additional two queries
+Indexes added:
+
+Additional querires added:
 
 
---Indexes
-
-
---Add a taks
+--Add a task for featuredSpeaker
