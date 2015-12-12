@@ -143,6 +143,7 @@ class SessionForm(messages.Message):
     speakerKey              = messages.StringField(7)
     conferenceKey           = messages.StringField(8)
 
+
 class SessionForms(messages.Message):
     """SessionForms -- multiple Session form message"""
     items = messages.MessageField(SessionForm, 1, repeated=True)

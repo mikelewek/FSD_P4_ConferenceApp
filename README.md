@@ -29,7 +29,7 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 ###Task #1 - Explanation of Design Choices
 The Session class, SessionForm class, and Endpoints were created, utilizing required variables in the project outline.
 
-The Session class properties were added to allow the user to sort by type and speaker.
+The Session class properties typeOfSession and speakerKey were added to allow the user to sort by type and speaker.
 
 An Endpoint and method was created to get all sessions (getConferenceSessions). The CONF_GET_REQUEST is set as the request message class and SessionForm is set as the response message class. Sessions are queried and a SessionForm message object is returned containing all sessions.
 

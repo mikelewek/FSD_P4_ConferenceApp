@@ -646,8 +646,8 @@ class ConferenceApi(remote.Service):
         session_id = Session.allocate_ids(size=1, parent=conf_key)[0]
 
         # create a key from the ID and add it to dict object
-        s_key = ndb.Key(Session, session_id, parent=conf_key)
-        data['key'] = s_key
+        session_key = ndb.Key(Session, session_id, parent=conf_key)
+        data['key'] = session_key
 
         # create Session & save to Datastore
         sess = Session(**data)
@@ -656,7 +656,7 @@ class ConferenceApi(remote.Service):
         ##
         ## TODO : set featured speaker
         ##
-        return self._copySessionToForm(s_key.get())
+        return self._copySessionToForm(session_key.get())
 
     @endpoints.method(CONF_GET_TYPE_REQUEST, SessionForms,
             path='conference/{websafeConferenceKey}/sessions/type/{typeOfSession}',
@@ -742,10 +742,10 @@ class ConferenceApi(remote.Service):
             raise endpoints.UnauthorizedException('Authorization required')
 
         # get session
-        session = ndb.Key(urlsafe=request.sessionKey).get()
+        session = ndb.Key(urlsafe=request.SessionKey).get()
         if not session:
             raise endpoints.NotFoundException(
-                'No session found with key: %s' % request.sessionKey)
+                'No session found with key: %s' % request.SessionKey)
 
         logging.error("xxxxxXxxxxxxxsesskey - %s", session)
 
@@ -755,9 +755,9 @@ class ConferenceApi(remote.Service):
         # verify session is not in wishlist
         if session.key in profile.wishList:
             raise endpoints.BadRequestException(
-                'Session already exists wishlist: %s' % request.sessionKey)
+                'Session already exists wishlist: %s' % request.SessionKey)
 
-        profile.wishList.append(request.sessionKey)
+        profile.wishList.append(request.SessionKey)
 
         # Save the profile back to Datastore
         profile.put()
@@ -800,18 +800,24 @@ class ConferenceApi(remote.Service):
         profile = self._getProfileFromUser()
 
         # get session
-        sess = ndb.Key(urlsafe=request.sessionKey).get()
+        sess = ndb.Key(urlsafe=request.SessionKey).get()
         if not sess:
             raise endpoints.NotFoundException(
-                'No Session found with key: %s' % request.sessionKey)
+                'No Session found with key: %s' % request.SessionKey)
 
         # remove session from wishlist if exists then save profile
-        if request.sessionKey in profile.wishList:
-            profile.wishList.remove(request.sessionKey)
+        if request.SessionKey in profile.wishList:
+            profile.wishList.remove(request.SessionKey)
         profile.put()
         is_deleted = True
 
         # is_deleted is true if session was removed
         return BooleanMessage(data=is_deleted)
+
+    @endpoints.method(WISHLIST_POST_REQUEST, BooleanMessage,
+                      path='getfeaturedspeaker', http_method='POST')
+    def getFeaturedSpeaker(self, request):
+        """Get featured speaker
+        add memcache key if more than one speaker for conference"""
 
 api = endpoints.api_server([ConferenceApi]) # register API
