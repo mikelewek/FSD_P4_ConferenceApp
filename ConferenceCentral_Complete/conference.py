@@ -42,6 +42,7 @@ from models import SessionForm
 from models import SessionForms
 from models import Speaker
 from models import SpeakerForm
+from models import EmailForms
 
 from settings import WEB_CLIENT_ID
 from settings import ANDROID_CLIENT_ID
@@ -122,6 +123,11 @@ CONF_POST_REQUEST = endpoints.ResourceContainer(
 WISHLIST_POST_REQUEST = endpoints.ResourceContainer(
     message_types.VoidMessage,
     sessionKey=messages.StringField(1, required=True),
+)
+
+PROFILE_GET_EMAIL_REQUEST = endpoints.ResourceContainer(
+    message_types.VoidMessage,
+    mainEmail=messages.StringField(1),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -841,6 +847,24 @@ class ConferenceApi(remote.Service):
         # return sessions obj
         return SessionForms(
             items=[self._copySessionToForm(sess) for sess in sessions]
+        )
+
+    @endpoints.method(PROFILE_GET_EMAIL_REQUEST, EmailForms,
+            path='profilebyemail/{mainEmail}',
+            http_method='GET')
+    def getProfileByEmail(self, request):
+        """Get profile by email"""
+
+        # get profile by email from datastore
+        profile = Profile.query(Profile.mainEmail == request.mainEmail)
+
+        # verify email and profile exists
+        if not request.mainEmail or not profile:
+            raise endpoints.NotFoundException('Profile or email not found: %s - %s' %
+                                              (profile, request.mainEmail))
+
+        return EmailForms(
+            items=[self._copyProfileToForm(prof) for prof in profile]
         )
 
 api = endpoints.api_server([ConferenceApi]) # register API

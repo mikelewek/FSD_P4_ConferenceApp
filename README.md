@@ -47,4 +47,5 @@ A wishList repeated list property was added to the Profile model class and funct
 Indexes added:
 
 Two additional queries added:
-getConferenceSessionsByHighlights(websafeConferenceKey, highlights) - Retrieves conference sessions by highlights. 
+1. getConferenceSessionsByHighlights(websafeConferenceKey, highlights) - Retrieves conference sessions by highlight.
+2. getProfileByEmail(mainEmail) - Retrieves profile by entering specified email address.
