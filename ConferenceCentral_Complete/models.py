@@ -152,7 +152,6 @@ class SessionForms(messages.Message):
 class Speaker(ndb.Model):
     """Speaker object"""
     displayName = ndb.StringProperty(required=True)
-    biography = ndb.StringProperty()
 
 
 class SpeakerForm(messages.Message):
