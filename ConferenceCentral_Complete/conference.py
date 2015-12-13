@@ -91,10 +91,10 @@ CONF_GET_TYPE_REQUEST = endpoints.ResourceContainer(
     typeOfSession=messages.StringField(2),
 )
 
-CONF_GET_DURATION_REQUEST = endpoints.ResourceContainer(
+CONF_GET_HIGHLIGHTS_REQUEST = endpoints.ResourceContainer(
     message_types.VoidMessage,
     websafeConferenceKey=messages.StringField(1, required=True),
-    duration=messages.StringField(2),
+    highlights=messages.StringField(2),
 )
 
 SESSIONS_GET_REQUEST = endpoints.ResourceContainer(
@@ -822,21 +822,20 @@ class ConferenceApi(remote.Service):
         # is_deleted is true if session was removed
         return BooleanMessage(data=is_deleted)
 
-    @endpoints.method(CONF_GET_DURATION_REQUEST, SessionForms,
-            path='conference/{websafeConferenceKey}/sessions/type/{duration}',
+    @endpoints.method(CONF_GET_HIGHLIGHTS_REQUEST, SessionForms,
+            path='conference/{websafeConferenceKey}/sessions/type/{highlights}',
             http_method='GET')
-    def getConferenceSessionsByDuration(self, request):
-        """Get sessions by duration"""
+    def getConferenceSessionsByHighlights(self, request):
+        """Get sessions by highlights"""
 
         # get conference by websafeConferenceKey
         conference = ndb.Key(urlsafe=request.websafeConferenceKey)
 
-        # get sessions if conference and duration exists
-        if not request.duration or not conference:
+        # get sessions if conference and highlights exists
+        if not request.highlights or not conference:
             raise endpoints.NotFoundException('Conference or duration not found: %s - %s' %
-                                              (conference, request.duration))
-
-        sessions = Session.query(Session.duration == request.duration,
+                                              (conference, request.highlights))
+        sessions = Session.query(Session.highlights == request.highlights,
                                  ancestor=conference)
 
         # return sessions obj

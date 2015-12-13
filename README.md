@@ -46,7 +46,5 @@ A wishList repeated list property was added to the Profile model class and funct
 ###Task #3 - Indexes and additional two queries
 Indexes added:
 
-Additional querires added:
-
-
---Add a task for featuredSpeaker
+Two additional queries added:
+getConferenceSessionsByHighlights(websafeConferenceKey, highlights) - Retrieves conference sessions by highlights. 
