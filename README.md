@@ -12,7 +12,7 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 --------------------
  1. The user must have a Google account.
  2. The user must create a new project in the Google Developer's Console and copy over the following: The application name must be changed in app.yaml. The CLIENT_ID must be changed in static/js/app.js. The WEB_CLIENT_ID must be changed in settings.py.
- 3. Updating your user profile at <code>/profile</code> should be the first step after the app. has started running. It is required to associate conferences with a user and sessions with a conference.
+ 3. Updating your user profile at <code>/profile</code> should be the first step after the app. has started running. It is required to associate conferences and sessions with an authenticated profile.
  4. Google App Engine SDK is required to test and deploy to the app engine production environment. [https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
  5. Testing locally can be done through the APIs Explorer: <code>http://localhost:8080/_ah/api/explorer</code>
  6. Viewing the data in the Datastore Viewer: <code>http://localhost:8001/datastore?kind=Conference</code>
