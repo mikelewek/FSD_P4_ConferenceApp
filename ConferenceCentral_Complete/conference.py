@@ -876,12 +876,13 @@ class ConferenceApi(remote.Service):
         # get profile by email from datastore
         profile = Profile.query(Profile.mainEmail == request.mainEmail)
 
-        # get keys from profile and verify user is registered in conference
+        # verify user profile keys are registered in conference
         # with conference organizer
         for prof in profile:
-            logging.error("xxxxXXXxxxXXXXXprofilehere %s", prof.conferenceKeysToAttend)
-            for keys in prof.conferenceKeysToAttend:
-                logging.error("XXXXXXXXXXXXkeys%", keys)
+            if request.conferenceKey not in prof.conferenceKeysToAttend:
+                raise endpoints.ForbiddenException(
+                    'User is not registered in Conference Organizers conference.'
+                )
 
         # verify email and profile exists
         if not request.mainEmail or not profile:
