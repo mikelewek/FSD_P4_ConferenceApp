@@ -128,6 +128,7 @@ WISHLIST_POST_REQUEST = endpoints.ResourceContainer(
 PROFILE_GET_EMAIL_REQUEST = endpoints.ResourceContainer(
     message_types.VoidMessage,
     mainEmail=messages.StringField(1),
+    conferenceKey=messages.StringField(2),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -676,7 +677,7 @@ class ConferenceApi(remote.Service):
     def getConferenceSessionsByType(self, request):
         """Get sessions by type"""
 
-        # get conference by websafeConferenceKey
+        # get conference by websafeConferenceKey in datastore
         conference = ndb.Key(urlsafe=request.websafeConferenceKey)
 
         # get sessions if conference and type exists
@@ -754,7 +755,7 @@ class ConferenceApi(remote.Service):
     def addSessionToWishlist(self, request):
         """Save session to user's profile wishlist"""
 
-        # verify sure user is authed
+        # verify user is authed
         user = endpoints.get_current_user()
         if not user:
             raise endpoints.UnauthorizedException('Authorization required')
@@ -850,13 +851,37 @@ class ConferenceApi(remote.Service):
         )
 
     @endpoints.method(PROFILE_GET_EMAIL_REQUEST, EmailForms,
-            path='profilebyemail/{mainEmail}',
+            path='profilebyemail/{conferenceKey}/{mainEmail}',
             http_method='GET')
     def getProfileByEmail(self, request):
-        """Get profile by email"""
+        """Allows conference organizer to get registered profile by email"""
+
+        # verify user is authed or error
+        user = endpoints.get_current_user()
+        if not user:
+            raise endpoints.UnauthorizedException('Authorization required')
+
+        conf = ndb.Key(urlsafe=request.conferenceKey)
+        if not conf:
+            raise endpoints.NotFoundException(
+                'No conference found: %s' % request.conferenceKey)
+
+        # verify user is conference organizer
+        if conf.parent() != ndb.Key(Profile, getUserId(user)):
+            raise endpoints.ForbiddenException(
+                'You must be the conference organizer to create'
+                'sessions for this conference.'
+            )
 
         # get profile by email from datastore
         profile = Profile.query(Profile.mainEmail == request.mainEmail)
+
+        # get keys from profile and verify user is registered in conference
+        # with conference organizer
+        for prof in profile:
+            logging.error("xxxxXXXxxxXXXXXprofilehere %s", prof.conferenceKeysToAttend)
+            for keys in prof.conferenceKeysToAttend:
+                logging.error("XXXXXXXXXXXXkeys%", keys)
 
         # verify email and profile exists
         if not request.mainEmail or not profile:
