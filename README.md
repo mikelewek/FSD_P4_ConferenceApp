@@ -32,9 +32,9 @@ The Session class, SessionForm class, and Endpoints were created, utilizing requ
 
 The Session class properties typeOfSession and speakerKey were added to allow the user to sort by type and speaker.
 
-An Endpoint and method was created to get all sessions (getConferenceSessions). The CONF_GET_REQUEST is set as the request message class and SessionForm is set as the response message class. Sessions are queried and a SessionForm message object is returned containing all sessions.
+An Endpoint was created to get all sessions (getConferenceSessions). The CONF_GET_REQUEST is set as the request message class and SessionForm is set as the response message class. Sessions are queried in the datastore using the websafeConferenceKey and a SessionForm message object is returned containing all sessions.
 
-The getConferenceSessionsByType method uses CONF_GET_TYPE_REQUEST as the request message class.
+The getConferenceSessionsByType method uses CONF_GET_TYPE_REQUEST as the request message class. The websafeConferenceKey is queried and returned from the datastore, if it exists. The SessionForms form message is returned as the response message.
 
 The getSessionsBySpeaker method uses CONF_GET_SPEAKER_REQUEST as the request message class. Sessions are queried, replicating the previous two functions.
 
@@ -48,4 +48,4 @@ Indexes added:
 
 Two additional queries added:
 1. getConferenceSessionsByHighlights(websafeConferenceKey, highlights) - Retrieves conference sessions by highlight.
-2. getProfileByEmail(mainEmail) - Retrieves profile by entering specified email address.
+2. getProfileByEmail(mainEmail) - Retrieves profile by entering email address. 
