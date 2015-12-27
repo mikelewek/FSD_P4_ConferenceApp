@@ -1,4 +1,3 @@
-# Set the total storage limit for all queues to 120MB
 queue:
 - name: default
   rate: 3/s
