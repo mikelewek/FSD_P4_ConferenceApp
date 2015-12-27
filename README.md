@@ -28,15 +28,12 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 </pre>
 
 ###Task #1 - Explanation of Design Choices
-The Session class, SessionForm class, and Endpoints were created, utilizing required variables in the project outline.
 
-The Session class properties typeOfSession and speakerKey were added to allow the user to sort by type and speaker.
-
-An Endpoint was created to get all sessions (getConferenceSessions). The CONF_GET_REQUEST is set as the request message class and SessionForm is set as the response message class. Sessions are queried in the datastore using the websafeConferenceKey and a SessionForm message object is returned containing all sessions.
-
-The getConferenceSessionsByType method uses CONF_GET_TYPE_REQUEST as the request message class. The websafeConferenceKey is queried and returned from the datastore, if it exists. The SessionForms form message is returned as the response message.
-
-The getSessionsBySpeaker method uses CONF_GET_SPEAKER_REQUEST as the request message class. Sessions are queried, replicating the previous two functions.
+* The Session and SessionForm model and endpoints were created as necessary, utilizing required variables in the project outline.
+* The Session class properties: typeOfSession and speakerKey were added to allow the user to sort by type and speaker.
+* An endpoint was created to get all sessions (getConferenceSessions). The CONF_GET_REQUEST is set as the request message class and SessionForm is set as the response message class. Sessions are queried in the datastore using the websafeConferenceKey and a SessionForm message object is returned containing all sessions.
+* The getConferenceSessionsByType method uses CONF_GET_TYPE_REQUEST as the request message class. The websafeConferenceKey is queried and returned from the datastore, if it exists. The SessionForms form message is returned as the response message.
+* The getSessionsBySpeaker method uses CONF_GET_SPEAKER_REQUEST as the request message class. Sessions are queried, replicating the previous two functions.
 
 ###Task #2 - Add Session to Wishlist
 Wishlist endpoints were implemented as required. addSessionToWishlist(SessionKey), getSessionsInWishlist(), deleteSessionInWishlist(SessionKey)
