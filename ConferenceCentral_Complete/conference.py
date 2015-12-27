@@ -15,8 +15,8 @@ __author__ = 'wesc+api@google.com (Wesley Chun)'
 
 from datetime import datetime
 
-import endpoints
 import logging
+import endpoints
 from protorpc import messages
 from protorpc import message_types
 from protorpc import remote
@@ -605,7 +605,7 @@ class ConferenceApi(remote.Service):
     def _createSessionObject (self, request):
         """internal function to create session object"""
 
-        # verify user is authed or error
+        # verify user is authed
         user = endpoints.get_current_user()
         if not user:
             raise endpoints.UnauthorizedException('Authorization required')
@@ -644,14 +644,14 @@ class ConferenceApi(remote.Service):
                 data['startTime'], "%H:%M").time()
 
         # get conference from request
-        websafe_conference_key = request.conferenceKey
-        conf_key = ndb.Key(urlsafe=websafe_conference_key)
+        wsck = request.conferenceKey
+        conf_key = ndb.Key(urlsafe=wsck)
         conf = conf_key.get()
 
-        # if not found, raise an exception and abort
+        # verify conference exists
         if not conf:
             raise endpoints.NotFoundException(
-                'No conference found with key: %s' % websafe_conference_key)
+                'No conference found with key: %s' % wsck)
 
         # create a unique session ID
         session_id = Session.allocate_ids(size=1, parent=conf_key)[0]
@@ -664,10 +664,9 @@ class ConferenceApi(remote.Service):
         sess = Session(**data)
         sess.put()
 
-        ##
-        ## TODO : set featured speaker
-        # add memcache key if more than one speaker for conference
-
+        # if speakerKey is set, add the task to the default queue
+        if data['speakerKey']:
+            taskqueue.add(url='/set_featured_speaker', params={'key': wsck})
 
         return self._copySessionToForm(session_key.get())
 
@@ -747,6 +746,15 @@ class ConferenceApi(remote.Service):
                       path='getfeaturedspeaker', http_method='POST')
     def getFeaturedSpeaker(self, request):
         """Get featured speaker"""
+
+    @staticmethod
+    def _setFeaturedSpeaker():
+        """Set featured speaker for session based on
+         assigned speaker count for conference"""
+
+        # get sessions from conferenceKey request
+
+        # set speaker if count is greater or equal compared to others
 
 
 # - - - Wishlist - - - - - - - - - - - - - - - - -
@@ -856,7 +864,7 @@ class ConferenceApi(remote.Service):
     def getProfileByEmail(self, request):
         """Allows conference organizer to get registered profile by email"""
 
-        # verify user is authed or error
+        # verify user is authed
         user = endpoints.get_current_user()
         if not user:
             raise endpoints.UnauthorizedException('Authorization required')
