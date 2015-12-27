@@ -154,15 +154,3 @@ class SessionForm(messages.Message):
 class SessionForms(messages.Message):
     """SessionForms -- multiple Session form message"""
     items = messages.MessageField(SessionForm, 1, repeated=True)
-
-
-class Speaker(ndb.Model):
-    """Speaker object"""
-    displayName = ndb.StringProperty(required=True)
-
-
-class SpeakerForm(messages.Message):
-    """SpeakerForm message"""
-    displayName = messages.StringField(1)
-    profileKey = messages.StringField(2)
-    websafeKey = messages.StringField(4)

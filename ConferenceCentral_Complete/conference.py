@@ -662,13 +662,15 @@ class ConferenceApi(remote.Service):
         session_key = ndb.Key(Session, session_id, parent=conf_key)
         data['key'] = session_key
 
-        # create Session & save to Datastore
+        # create Session & save to datastore
         sess = Session(**data)
         sess.put()
 
         ##
         ## TODO : set featured speaker
-        ##
+        # add memcache key if more than one speaker for conference
+
+
         return self._copySessionToForm(session_key.get())
 
     @endpoints.method(CONF_GET_TYPE_REQUEST, SessionForms,
@@ -746,8 +748,8 @@ class ConferenceApi(remote.Service):
     @endpoints.method(WISHLIST_POST_REQUEST, BooleanMessage,
                       path='getfeaturedspeaker', http_method='POST')
     def getFeaturedSpeaker(self, request):
-        """Get featured speaker
-        add memcache key if more than one speaker for conference"""
+        """Get featured speaker"""
+
 
 # - - - Wishlist - - - - - - - - - - - - - - - - -
     @endpoints.method(WISHLIST_POST_REQUEST, SessionForm,
@@ -774,7 +776,7 @@ class ConferenceApi(remote.Service):
 
         profile.wishList.append(request.SessionKey)
 
-        # Save the profile back to Datastore
+        # Save the profile back to datastore
         profile.put()
 
         return self._copySessionToForm(session)

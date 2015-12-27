@@ -30,7 +30,7 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 ###Task #1 - Explanation of Design Choices
 
 * The Session and SessionForm model and endpoints were created as necessary, utilizing required variables in the project outline.
-* The Session class properties: typeOfSession and speakerKey were added to allow the user to sort by type and speaker.
+* The Session class properties: typeOfSession and speakerKey endpoints were created. A speakerKey property was added to the Session and SessionForm class to create a ancestor relationship with a speaker's profile entity key, to allow the user to assign and sort by speaker. A typeOfSession property was added to the Session and SessionForm model which allows the user to insert and sort by type. 
 * An endpoint was created to get all sessions (getConferenceSessions). The CONF_GET_REQUEST is set as the request message class and SessionForm is set as the response message class. Sessions are queried in the datastore using the websafeConferenceKey and a SessionForm message object is returned containing all sessions.
 * The getConferenceSessionsByType endpoint uses CONF_GET_TYPE_REQUEST as the request message class. The websafeConferenceKey is queried and returned from the datastore, if it exists. The SessionForms form message is returned as the response message.
 * The getSessionsBySpeaker endpoint uses CONF_GET_SPEAKER_REQUEST as the request message class. Sessions are queried, replicating the previous two functions.
@@ -46,7 +46,7 @@ A wishList repeated list property was added to the Profile model class and funct
 ###Task #3 - Indexes and additional two queries
 Indexes added:
 
-Two additional queries added:
+Two additional queries added: None
 
 1. getConferenceSessionsByHighlights(websafeConferenceKey, highlights) - Retrieves conference sessions by highlight.
 2. getProfileByEmail(mainEmail) - Allows conference organizer to retrieve a registered user's profile by entering their email address.
