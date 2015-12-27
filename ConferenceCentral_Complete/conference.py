@@ -40,8 +40,6 @@ from models import TeeShirtSize
 from models import Session
 from models import SessionForm
 from models import SessionForms
-from models import Speaker
-from models import SpeakerForm
 from models import EmailForms
 
 from settings import WEB_CLIENT_ID
