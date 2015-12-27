@@ -1,17 +1,20 @@
 ##Conference Organization App. - FSD Project 4
 
-This application uses Google Cloud API's, OAuth, and Endpoints for a Conference App. Users can edit their profile, create and register conferences, view conferences, conference details, and which conferences a user has created and attended.
+This application uses Google Cloud API's, OAuth, and Endpoints for a Conference App. that allows a developer to create horizontally scalable applications quickly and available to a variety of platforms. In this conference app., users can edit their profile, create and register conferences, create sessions, view and sort by conferences and sessions, as well as additional functionality as mentioned in the following README file.
 
 ###The Repo. Contains the Following Files
 -------------------------------------
- 1. /ud858/ConferenceCentral_Complete - Proect files were provided by Udacity and modified for the Lesson to implement additional functionality as explained in the Tasks below.
- 2. README.md
- 
+ 1. /ud858/ConferenceCentral_Complete - Project files were provided by Udacity and modified and/or expanded upon for the Lesson to implement additional functionality as explained in the Tasks below.
+ 2. /ud858/ConferenceCentral_Complete/settings.py - Google API Client ID's set here.
+ 3. /ud858/ConferenceCentral_Complete/conference.py - Endpoints and utility methods to create, edit, and view conference, session, and profiles, etc.
+ 4. /ud858/ConferenceCentral_Complete/models.py - Models for the app. Conference, Session, Profile classes.
+ 5. /ud858/ConferenceCentral_Complete/queue.py - Queue config file for tasks.
+ 6. README.md
  
 ###Requirements
 --------------------
  1. The user must have a Google account.
- 2. The user must create a new project in the Google Developer's Console and copy over the following: The application name must be changed in app.yaml. The CLIENT_ID must be changed in static/js/app.js. The WEB_CLIENT_ID must be changed in settings.py.
+ 2. The user must create a new project in the Google Developer's Console and copy over the following: The application name must be changed in app.yaml. The CLIENT_ID must be changed in static/js/app.js. The client ID's in the settings.py file must be obtained from the API's and changed.
  3. Updating your user profile at <code>/profile</code> should be the first step after the app. has started running. It is required to associate conferences and sessions with an authenticated profile.
  4. Google App Engine SDK is required to test and deploy to the app engine production environment. [https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
  5. Testing locally can be done through the APIs Explorer: <code>http://localhost:8080/_ah/api/explorer</code>
