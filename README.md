@@ -34,7 +34,7 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 * An endpoint was created to get all sessions (getConferenceSessions). The CONF_GET_REQUEST is set as the request message class and SessionForm is set as the response message class. Sessions are queried in the datastore using the websafeConferenceKey and a SessionForm message object is returned containing all sessions.
 * The getConferenceSessionsByType endpoint uses CONF_GET_TYPE_REQUEST as the request message class. The websafeConferenceKey is queried and returned from the datastore, if it exists. The SessionForms form message is returned as the response message.
 * The getSessionsBySpeaker endpoint uses CONF_GET_SPEAKER_REQUEST as the request message class. Sessions are queried, replicating the previous two functions.
-* The addSessionsToWishlist, getSessionsInWishlist, and delete SessionsInWishlist endpoints do as their name suggests by utilizing SessionForm, SessionForms, and BooleanMessage response message classes.
+* Wishlist endpoints were created as described in Task #2 below.
 * The getConferenceSessionsByHighlights endpoint queries a conference and filters by highlights similar the the getSessionsBySpeaker and getConferenceSessionsByType endpoints above.
 * The getProfileByEmail endpoint queries a user's profile by email using PROFILE_GET_EMAIL_REQUEST as teh request message class and EmailForms as the response class.
 
