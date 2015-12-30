@@ -34,13 +34,13 @@ from models import BooleanMessage
 from models import Conference
 from models import ConferenceForm
 from models import ConferenceForms
-from models import ConferenceQueryForm
 from models import ConferenceQueryForms
 from models import TeeShirtSize
 from models import Session
 from models import SessionForm
 from models import SessionForms
 from models import EmailForms
+from models import SpeakerForm
 
 from settings import WEB_CLIENT_ID
 from settings import ANDROID_CLIENT_ID
@@ -664,10 +664,11 @@ class ConferenceApi(remote.Service):
         sess = Session(**data)
         sess.put()
 
-        logging.info("XXxxxxxSpeakerKey %s", data["speakerKey"])
         # if speakerKey is set, add the task to the default queue
         if data['speakerKey']:
-            taskqueue.add(url='/tasks/set_featured_speaker', params={'key': wsck})
+            taskqueue.add(url='/tasks/get_featured_speaker',
+                          params={'websafekey': wsck, 'speakerKey':
+                              data['speakerKey']})
 
         return self._copySessionToForm(session_key.get())
 
@@ -742,31 +743,6 @@ class ConferenceApi(remote.Service):
             items=[self._copySessionToForm(sess)
                    for sess in speaker_sessions]
         )
-
-    @endpoints.method(WISHLIST_POST_REQUEST, BooleanMessage,
-                      path='getfeaturedspeaker', http_method='POST')
-    def getFeaturedSpeaker(self, request):
-        """Get featured speaker"""
-
-    @endpoints.method(WISHLIST_POST_REQUEST, BooleanMessage,
-                      path='getfeaturedspeaker', http_method='POST')
-    def getFeaturedSpeaker(self, request):
-        """Get featured speaker"""
-
-    @staticmethod
-    def _setFeaturedSpeaker(self, conferenceKey):
-        """Set featured speaker for session based on
-         assigned speaker count for conference"""
-
-        # set to false until featured speaker is set
-        featured_set = False
-
-        # get sessions from conferenceKey request
-        conference_key = ndb.Key(urlsafe=conferenceKey)
-        conferenceSessions = Session.query(ancestor=conferenceKey)
-
-        # set speaker if count is greater or equal compared to others
-        return True
 
 # - - - Wishlist - - - - - - - - - - - - - - - - -
     @endpoints.method(WISHLIST_POST_REQUEST, SessionForm,

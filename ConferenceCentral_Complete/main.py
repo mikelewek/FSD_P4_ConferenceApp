@@ -16,7 +16,9 @@ import logging
 import webapp2
 from google.appengine.api import app_identity
 from google.appengine.api import mail
+from google.appengine.ext import ndb
 from conference import ConferenceApi
+from models import Session
 
 class SetAnnouncementHandler(webapp2.RequestHandler):
     def get(self):
@@ -38,14 +40,20 @@ class SendConfirmationEmailHandler(webapp2.RequestHandler):
                 'conferenceInfo')
         )
 
-class SetFeaturedSpeakerHandler(webapp2.RequestHandler):
-    def get(self):
+class GetFeaturedSpeakerHandler(webapp2.RequestHandler):
+    def post(self):
         """Set Featured Speaker"""
-        ConferenceApi._cacheAnnouncement()
+        from models import Session
+
+        # get sessions from conferencekey request
+        conference_key = ndb.Key(urlsafe=self.request.get('websafekey'))
+        conferenceSessions = Session.query(ancestor=conference_key)
+        logging.info("XXXXxxxxxconfkeyfromTask %s", conferenceSessions)
+
         self.response.set_status(204)
 
 app = webapp2.WSGIApplication([
     ('/crons/set_announcement', SetAnnouncementHandler),
     ('/tasks/send_confirmation_email', SendConfirmationEmailHandler),
-    ('/tasks/set_featured_speaker', SetFeaturedSpeakerHandler),
+    ('/tasks/get_featured_speaker', GetFeaturedSpeakerHandler),
 ], debug=True)
