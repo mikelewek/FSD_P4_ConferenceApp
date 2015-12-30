@@ -664,9 +664,10 @@ class ConferenceApi(remote.Service):
         sess = Session(**data)
         sess.put()
 
+        logging.info("XXxxxxxSpeakerKey %s", data["speakerKey"])
         # if speakerKey is set, add the task to the default queue
         if data['speakerKey']:
-            taskqueue.add(url='/set_featured_speaker', params={'key': wsck})
+            taskqueue.add(url='/tasks/set_featured_speaker', params={'key': wsck})
 
         return self._copySessionToForm(session_key.get())
 
@@ -747,15 +748,25 @@ class ConferenceApi(remote.Service):
     def getFeaturedSpeaker(self, request):
         """Get featured speaker"""
 
+    @endpoints.method(WISHLIST_POST_REQUEST, BooleanMessage,
+                      path='getfeaturedspeaker', http_method='POST')
+    def getFeaturedSpeaker(self, request):
+        """Get featured speaker"""
+
     @staticmethod
-    def _setFeaturedSpeaker():
+    def _setFeaturedSpeaker(self, conferenceKey):
         """Set featured speaker for session based on
          assigned speaker count for conference"""
 
+        # set to false until featured speaker is set
+        featured_set = False
+
         # get sessions from conferenceKey request
+        conference_key = ndb.Key(urlsafe=conferenceKey)
+        conferenceSessions = Session.query(ancestor=conferenceKey)
 
         # set speaker if count is greater or equal compared to others
-
+        return True
 
 # - - - Wishlist - - - - - - - - - - - - - - - - -
     @endpoints.method(WISHLIST_POST_REQUEST, SessionForm,
@@ -782,7 +793,7 @@ class ConferenceApi(remote.Service):
 
         profile.wishList.append(request.SessionKey)
 
-        # Save the profile back to datastore
+        # save the profile back to datastore
         profile.put()
 
         return self._copySessionToForm(session)

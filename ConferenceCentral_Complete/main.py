@@ -12,6 +12,7 @@ created by wesc on 2014 may 24
 
 __author__ = 'wesc+api@google.com (Wesley Chun)'
 
+import logging
 import webapp2
 from google.appengine.api import app_identity
 from google.appengine.api import mail
@@ -40,7 +41,7 @@ class SendConfirmationEmailHandler(webapp2.RequestHandler):
 class SetFeaturedSpeakerHandler(webapp2.RequestHandler):
     def get(self):
         """Set Featured Speaker"""
-        ConferenceApi._setFeaturedSpeaker()
+        ConferenceApi._cacheAnnouncement()
         self.response.set_status(204)
 
 app = webapp2.WSGIApplication([
