@@ -73,7 +73,7 @@ class Conference(ndb.Model):
     endDate         = ndb.DateProperty()
     maxAttendees    = ndb.IntegerProperty()
     seatsAvailable  = ndb.IntegerProperty()
-
+    speakerKey      = ndb.StringProperty()
 
 class ConferenceForm(messages.Message):
     """ConferenceForm -- Conference outbound form message"""
@@ -89,7 +89,7 @@ class ConferenceForm(messages.Message):
     endDate         = messages.StringField(10) #DateTimeField()
     websafeKey      = messages.StringField(11)
     organizerDisplayName = messages.StringField(12)
-
+    speakerKey  = messages.StringField(13)
 
 class ConferenceForms(messages.Message):
     """ConferenceForms -- multiple Conference outbound form message"""
@@ -154,12 +154,4 @@ class SessionForms(messages.Message):
     """SessionForms -- multiple Session form message"""
     items = messages.MessageField(SessionForm, 1, repeated=True)
 
-class Speaker(ndb.Model):
-    """Speaker object"""
-    displayName = ndb.StringProperty(required=True)
 
-
-class SpeakerForm(messages.Message):
-    """SpeakerForm message"""
-    displayName = messages.StringField(1)
-    profileKey = messages.StringField(2)
