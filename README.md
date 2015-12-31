@@ -40,7 +40,8 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 * The getSessionsBySpeaker endpoint uses CONF_GET_SPEAKER_REQUEST as the request message class. Sessions are queried, replicating the previous two functions.
 * Wishlist endpoints were created as described in Task #2 below.
 * The getConferenceSessionsByHighlights endpoint queries a conference and filters by highlights similar the the getSessionsBySpeaker and getConferenceSessionsByType endpoints above.
-* The getProfileByEmail endpoint queries a user's profile by email using PROFILE_GET_EMAIL_REQUEST as teh request message class and EmailForms as the response class.
+* The getProfileByEmail endpoint queries a user's profile by email using PROFILE_GET_REQUEST as the request message class and EmailForms as the response class.
+* The setFeaturedSpeaker endpoint was created as an endpoint to set a specific featured speaker. The getFeaturedSpeaker endpoint also uses the PROFILE_GET_REQUEST as the request message class and EmailForms as the response class and retrieves the featured speaker's conference.
 
 ###Task #2 - Add Session to Wishlist
 Wishlist endpoints were implemented as required. addSessionToWishlist(SessionKey), getSessionsInWishlist(), deleteSessionInWishlist(SessionKey)
@@ -54,3 +55,8 @@ Two additional queries added:
 
 1. getConferenceSessionsByHighlights(websafeConferenceKey, highlights) - Retrieves conference sessions by highlight.
 2. getProfileByEmail(mainEmail) - Allows conference organizer to retrieve a registered user's profile by entering their email address.
+
+###Task #4 - Implement getFeaturedSpeaker()
+
+Retrieves featured speaker set by setFeaturedSpeaker().
+
