@@ -849,14 +849,14 @@ class ConferenceApi(remote.Service):
         profile = self._getProfileFromUser()
 
         # get session
-        sess = ndb.Key(urlsafe=request.SessionKey).get()
+        sess = ndb.Key(urlsafe=request.sessionKey).get()
         if not sess:
             raise endpoints.NotFoundException(
-                'No Session found with key: %s' % request.SessionKey)
+                'No Session found with key: %s' % request.sessionKey)
 
         # remove session from wishlist if exists then save profile
-        if request.SessionKey in profile.wishList:
-            profile.wishList.remove(request.SessionKey)
+        if request.sessionKey in profile.wishList:
+            profile.wishList.remove(request.sessionKey)
         profile.put()
         is_deleted = True
 
