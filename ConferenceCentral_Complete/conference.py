@@ -796,19 +796,19 @@ class ConferenceApi(remote.Service):
             raise endpoints.UnauthorizedException('Authorization required')
 
         # get session
-        session = ndb.Key(urlsafe=request.SessionKey).get()
+        session = ndb.Key(urlsafe=request.sessionKey).get()
         if not session:
             raise endpoints.NotFoundException(
-                'No session found with key: %s' % request.SessionKey)
+                'No session found with key: %s' % request.sessionKey)
         profile = self._getProfileFromUser()
 
         # verify session is not in wishlist
         if session.key in profile.wishList:
             raise endpoints.BadRequestException(
-                'Session already exists wishlist: %s' % request.SessionKey)
+                'Session already exists wishlist: %s' % request.sessionKey)
 
         # save the profile back to datastore
-        profile.wishList.append(request.SessionKey)
+        profile.wishList.append(request.sessionKey)
 
         return self._copySessionToForm(session)
 
