@@ -36,8 +36,8 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 * The Session and SessionForm model and endpoints were created as necessary, utilizing required variables in the project outline.
 * The Session class properties: typeOfSession and speakerKey endpoints were created. A speakerKey property was added to the Session and SessionForm class to create a ancestor relationship with a speaker's profile entity key, to allow the user to assign and sort by speaker. A typeOfSession property was added to the Session and SessionForm model which allows the user to insert and sort by type. 
 * An endpoint was created to get all sessions (getConferenceSessions). The CONF_GET_REQUEST is set as the request message class and SessionForm is set as the response message class. Sessions are queried in the datastore using the websafeConferenceKey and a SessionForm message object is returned containing all sessions.
-* The getConferenceSessionsByType endpoint uses CONF_GET_TYPE_REQUEST as the request message class. The websafeConferenceKey is queried and returned from the datastore, if it exists. The SessionForms form message is returned as the response message.
-* The getSessionsBySpeaker endpoint uses CONF_GET_SPEAKER_REQUEST as the request message class. Sessions are queried, replicating the previous two functions.
+* The getConferenceSessionsByType - The websafeConferenceKey is queried and returned from the datastore, if it exists. The SessionForms form message is returned as the response message.
+* The getSessionsBySpeaker - Sessions are queried, replicating the previous two functions.
 * Wishlist endpoints were created as described in Task #2 below.
 * The getConferenceSessionsByHighlights endpoint queries a conference and filters by highlights similar the the getSessionsBySpeaker and getConferenceSessionsByType endpoints above.
 * The getProfileByEmail endpoint queries a user's profile by email using PROFILE_GET_REQUEST as the request message class and Conferenceform as the response class.
@@ -59,9 +59,9 @@ Two additional queries added:
 
 ###Task #4 - Implement getFeaturedSpeaker()
 
-The endpoint retrieves featured speaker saved by setFeaturedSpeaker() and createConference() endpoints. Featured Speaker key is the user's email address.
+The endpoint retrieves a conference's featured speaker set in memcache from the GetFeaturedSpeaker task. Featured Speaker key is the user's email address.
 
 ###Task #5 - Query Related Problem
 
 There is an issue because you want to query two properties. As stated in the documentation, you are limited to filtering one property at a time: [Inequality filters are limited to at most one property](https://cloud.google.com/appengine/docs/python/datastore/queries?hl=en#Python_Restrictions_on_queries)
-1. Solving this could be to query and filter one property, then iterate the results and remove the second query 'manually' in a loop.
+* Solving this could be to query and filter one property, then iterate the results and remove the second query 'manually' in a loop.
