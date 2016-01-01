@@ -41,7 +41,7 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 * Wishlist endpoints were created as described in Task #2 below.
 * The getConferenceSessionsByHighlights endpoint queries a conference and filters by highlights similar the the getSessionsBySpeaker and getConferenceSessionsByType endpoints above.
 * The getProfileByEmail endpoint queries a user's profile by email using PROFILE_GET_REQUEST as the request message class and Conferenceform as the response class.
-* The setFeaturedSpeaker endpoint was created to update a specific featured speaker. The getFeaturedSpeaker endpoint also uses the PROFILE_GET_REQUEST as the request message class and ConferenceForm as the response class and retrieves the featured speaker's conference. A speakerKey property was added to the Conference and ConferenceForm models to save and update a featured speaker.
+* The setFeaturedSpeaker endpoint was created to update a specific featured speaker uses PROFILE_GET_REQUEST and ConferenceForm as a request and response message class. The getFeaturedSpeaker endpoint uses the PROFILE_GET_REQUEST as the request message class and EmailForms as the response class and retrieves the featured speaker's conference. A speakerKey property was added to the Conference and ConferenceForm models to save and update a featured speaker.
 
 ###Task #2 - Add Session to Wishlist
 Wishlist endpoints were implemented as required. addSessionToWishlist(SessionKey), getSessionsInWishlist(), deleteSessionInWishlist(SessionKey)
@@ -60,3 +60,7 @@ Two additional queries added:
 
 Retrieves featured speaker saved by setFeaturedSpeaker() and createConference() endpoints.
 
+###Task #5 - Query Related Problem
+
+There is an issue because you want to query two properties. As stated in the documentation, you are limited to filtering one property at a time: [Inequality filters are limited to at most one property](https://cloud.google.com/appengine/docs/python/datastore/queries?hl=en#Python_Restrictions_on_queries)
+1. Solving this could be to query and filter one property, then iterate the results and remove the second query 'manually' in a loop.
