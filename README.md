@@ -42,7 +42,7 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 * The getConferenceSessionsByHighlights endpoint queries a conference and filters by highlights similar the the getSessionsBySpeaker and getConferenceSessionsByType endpoints above.
 * The getProfileByEmail endpoint queries a user's profile by email using PROFILE_GET_REQUEST as the request message class and Conferenceform as the response class.
 * The getFeaturedSpeaker endpoint gets the featured speaker profile if it exists in memcache.
-* The GetFeaturedSpeakerHandler in main.py is used to set featured speaker tasks by setting it in memcache.
+* The GetFeaturedSpeakerHandler in main.py is used to set featured speaker tasks by setting it in memcache when a new session object is created in the _createSessionObject utility function. 
 
 ###Task #2 - Add Session to Wishlist
 Wishlist endpoints were implemented as required. addSessionToWishlist(SessionKey), getSessionsInWishlist(), deleteSessionInWishlist(SessionKey)
