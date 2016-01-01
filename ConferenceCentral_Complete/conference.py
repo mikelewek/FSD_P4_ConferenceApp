@@ -809,6 +809,7 @@ class ConferenceApi(remote.Service):
 
         # save the profile back to datastore
         profile.wishList.append(request.sessionKey)
+        profile.put()
 
         return self._copyProfileToForm(profile)
 
