@@ -12,13 +12,15 @@ created by wesc on 2014 may 24
 
 __author__ = 'wesc+api@google.com (Wesley Chun)'
 
-import logging
 import webapp2
 from google.appengine.api import app_identity
 from google.appengine.api import mail
-from google.appengine.ext import ndb
+from google.appengine.api import memcache
+
 from conference import ConferenceApi
-from models import Session
+
+MEMCACHE_SPEAKER_KEY = "FEATURED SPEAKER"
+
 
 class SetAnnouncementHandler(webapp2.RequestHandler):
     def get(self):
@@ -40,16 +42,13 @@ class SendConfirmationEmailHandler(webapp2.RequestHandler):
                 'conferenceInfo')
         )
 
+
 class GetFeaturedSpeakerHandler(webapp2.RequestHandler):
     def post(self):
-        """Set Featured Speaker"""
-        from models import Session
+        """Set featured speaker using memcache"""
 
-        # get sessions from conferencekey request
-        conference_key = ndb.Key(urlsafe=self.request.get('websafekey'))
-        conferenceSessions = Session.query(ancestor=conference_key)
-        logging.info("XXXXxxxxxconfkeyfromTask %s", conferenceSessions)
-
+        memcache.set(self.request.get('websafeConferenceKey'),
+                     self.request.get('speakerKey'))
         self.response.set_status(204)
 
 app = webapp2.WSGIApplication([
