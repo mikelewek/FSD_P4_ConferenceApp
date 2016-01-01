@@ -785,7 +785,7 @@ class ConferenceApi(remote.Service):
         )
 
 # - - - Wishlist - - - - - - - - - - - - - - - - -
-    @endpoints.method(WISHLIST_POST_REQUEST, SessionForm,
+    @endpoints.method(WISHLIST_POST_REQUEST, ProfileForm,
                       path='addsessiontowishlist', http_method='POST')
     def addSessionToWishlist(self, request):
         """Save session to user's profile wishlist"""
@@ -810,7 +810,7 @@ class ConferenceApi(remote.Service):
         # save the profile back to datastore
         profile.wishList.append(request.sessionKey)
 
-        return self._copySessionToForm(session)
+        return self._copyProfileToForm(profile)
 
     @endpoints.method(WISHLIST_POST_REQUEST, SessionForms,
                       path='getsessionwishlist', http_method='POST')

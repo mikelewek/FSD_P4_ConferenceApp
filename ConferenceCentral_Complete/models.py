@@ -44,7 +44,7 @@ class ProfileForm(messages.Message):
     mainEmail = messages.StringField(2)
     teeShirtSize = messages.EnumField('TeeShirtSize', 3)
     conferenceKeysToAttend = messages.StringField(4, repeated=True)
-
+    wishList = messages.StringField(5, repeated=True)
 
 class EmailForms(messages.Message):
     """EmailForms -- outbound form message"""
