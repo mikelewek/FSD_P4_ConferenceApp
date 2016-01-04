@@ -46,6 +46,7 @@ class ProfileForm(messages.Message):
     conferenceKeysToAttend = messages.StringField(4, repeated=True)
     wishList = messages.StringField(5, repeated=True)
 
+
 class EmailForms(messages.Message):
     """EmailForms -- outbound form message"""
     items = messages.MessageField(ProfileForm, 1, repeated=True)
@@ -132,25 +133,39 @@ class Session(ndb.Model):
     """Session object"""
     sessionName             = ndb.StringProperty(required=True)
     highlights              = ndb.StringProperty()
-    duration                = ndb.StringProperty()
+    duration                = ndb.IntegerProperty()
     typeOfSession           = ndb.StringProperty()
     date                    = ndb.DateProperty()
     startTime               = ndb.TimeProperty()
     speakerKey              = ndb.StringProperty()
+    websafeKey              = ndb.StringProperty()
 
 
 class SessionForm(messages.Message):
     """SessionForm message"""
     sessionName             = messages.StringField(1)
     highlights              = messages.StringField(2)
-    duration                = messages.StringField(3)
+    duration                = messages.IntegerField(3)
     typeOfSession           = messages.StringField(4)
     date                    = messages.StringField(5)
     startTime               = messages.StringField(6)
     speakerKey              = messages.StringField(7)
     conferenceKey           = messages.StringField(8)
+    websafeKey              = messages.StringField(9)
 
 
 class SessionForms(messages.Message):
     """SessionForms -- multiple Session form message"""
     items = messages.MessageField(SessionForm, 1, repeated=True)
+
+
+class Speaker(ndb.Model):
+    """Speaker -- Speaker object"""
+    speakerKey = ndb.StringProperty(required=True)
+    sessionName = ndb.StringProperty(repeated=True)
+
+
+class SpeakerForm(messages.Message):
+    """SpeakerForm -- Speaker outbound form message"""
+    speakerKey  = messages.StringField(1)
+    sessionName = messages.StringField(2, repeated=True)

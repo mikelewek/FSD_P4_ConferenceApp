@@ -15,7 +15,6 @@ __author__ = 'wesc+api@google.com (Wesley Chun)'
 
 from datetime import datetime
 
-import logging
 import endpoints
 from protorpc import messages
 from protorpc import message_types
@@ -40,6 +39,7 @@ from models import Session
 from models import SessionForm
 from models import SessionForms
 from models import EmailForms
+from models import SpeakerForm
 
 from settings import WEB_CLIENT_ID
 from settings import ANDROID_CLIENT_ID
@@ -626,10 +626,10 @@ class ConferenceApi(remote.Service):
 
         # verify conference and session exist
         conf = ndb.Key(urlsafe=request.conferenceKey)
-        if not conf or not request.sessionName:
+        if not conf:
             raise endpoints.NotFoundException(
-                'No conference or sessionName found: %s - %s' %
-                (request.conferenceKey, request.sessionName))
+                'No conference found: %s'
+                % request.conferenceKey)
 
         # verify user is conference organizer
         if conf.parent() != ndb.Key(Profile, getUserId(user)):
@@ -668,6 +668,11 @@ class ConferenceApi(remote.Service):
         # create a key from the ID and add it to dict object
         session_key = ndb.Key(Session, session_id, parent=conf_key)
         data['key'] = session_key
+
+        # verify speaker exists
+        if not data['speakerKey']:
+            raise endpoints.NotFoundException(
+                'No speakerKey found: %s' % data['speakerKey'])
 
         # create Session & save to datastore
         sess = Session(**data)
@@ -727,14 +732,12 @@ class ConferenceApi(remote.Service):
         for field in session_form.all_fields():
             if hasattr(session, field.name):
                 # set fields - convert date and startTime to strings
-                if field.name.endswith('date'):
+                if field.name in ['startTime', 'date']:
                     setattr(session_form, field.name, str(getattr(session, field.name)))
-                elif field.name == 'startTime':
-                    setattr(session_form, field.name, str(getattr(session, field.name)))
-                elif field.name == "websafeKey":
-                    setattr(session_form, field.name, session.key.urlsafe())
                 else:
                     setattr(session_form, field.name, getattr(session, field.name))
+            elif field.name == "websafeKey":
+                    setattr(session_form, field.name, session.key.urlsafe())
             session_form.check_initialized()
         return session_form
 
@@ -748,41 +751,40 @@ class ConferenceApi(remote.Service):
 
         speaker_key = request.speakerKey
         speaker = ndb.Key(urlsafe=speaker_key)
-        speaker_sessions = Session.query(ancestor=speaker)
+        speaker_sessions = Session.query(Session.speakerKey == speaker)
 
         return SessionForms(
             items=[self._copySessionToForm(sess)
                    for sess in speaker_sessions]
         )
 
-    @endpoints.method(SPEAKER_GET_REQUEST, EmailForms,
+    @endpoints.method(SPEAKER_GET_REQUEST, SpeakerForm,
                       path='conference/getfeaturedspeaker/{websafeConferenceKey}',
                       http_method='POST')
     def getFeaturedSpeaker(self, request):
-        """Get featured speaker"""
+        """Get featured speaker from memcache"""
 
         # verify user is authed
         user = endpoints.get_current_user()
         if not user:
             raise endpoints.UnauthorizedException('Authorization required')
 
-        # get featured speaker form memcache if it exists
+        # get featured speaker from memcache if it exists
         conf = memcache.get(request.websafeConferenceKey)
         if not conf:
             raise endpoints.NotFoundException(
                 'No conference memcache found with key: %s' % request.websafeConferenceKey)
 
-        # get profile by websafekey from datastore
-        profile = Profile.query(Profile.mainEmail == conf)
-        logging.info('CXXCCCCCCCxxxxprofconf %s 0000 %s', profile, conf)
+        # iterate then return SpeakerForm
+        speaker_form = SpeakerForm()
+        for field in speaker_form.all_fields():
+            if field.name == 'sessionName':
+                setattr(speaker_form, field.name, conf['sessionName'])
+            elif field.name == 'speakerKey':
+                setattr(speaker_form, field.name, conf['speakerKey'])
+        speaker_form.check_initialized()
 
-        # verify profile exists then return profile of featured speaker
-        if not profile:
-            raise endpoints.NotFoundException('Profile not found: %s' % profile)
-
-        return EmailForms(
-            items=[self._copyProfileToForm(prof) for prof in profile]
-        )
+        return speaker_form
 
 # - - - Wishlist - - - - - - - - - - - - - - - - -
     @endpoints.method(WISHLIST_POST_REQUEST, ProfileForm,
@@ -813,8 +815,8 @@ class ConferenceApi(remote.Service):
 
         return self._copyProfileToForm(profile)
 
-    @endpoints.method(WISHLIST_POST_REQUEST, SessionForms,
-                      path='getsessionwishlist', http_method='POST')
+    @endpoints.method(message_types.VoidMessage, SessionForms,
+                      path='getsessionwishlist', http_method='GET')
     def getSessionsInWishlist(self, request):
         """Get sessions in Profile WishList"""
 
@@ -834,7 +836,7 @@ class ConferenceApi(remote.Service):
         )
 
     @endpoints.method(WISHLIST_POST_REQUEST, BooleanMessage,
-                      path='deletesessionwishlist', http_method='POST')
+                      path='deletesessionwishlist', http_method='DELETE')
     def deleteSessionInWishlist(self, request):
         """Remove Session from user's wishlist list"""
 
@@ -865,7 +867,7 @@ class ConferenceApi(remote.Service):
 
     @endpoints.method(CONF_GET_HIGHLIGHTS_REQUEST,
                       SessionForms,
-                      path='conference/{websafeConferenceKey}/sessions/type/{highlights}',
+                      path='conference/{websafeConferenceKey}/sessions/highlights/{highlights}',
                       http_method='GET')
     def getConferenceSessionsByHighlights(self, request):
         """Get sessions by highlights"""
@@ -889,7 +891,10 @@ class ConferenceApi(remote.Service):
                       path='profilebyemail/{conferenceKey}/{mainEmail}',
                       http_method='GET')
     def getProfileByEmail(self, request):
-        """Allows conference organizer to get registered profile by email"""
+        """This is more of an admin function which allows a conference
+        organizer to get a registered users profile by email address.
+        This will more useful in the future if more properties and user
+        details are added to the profile."""
 
         # verify user is authed
         user = endpoints.get_current_user()
@@ -904,14 +909,14 @@ class ConferenceApi(remote.Service):
         # verify user is conference organizer
         if conf.parent() != ndb.Key(Profile, getUserId(user)):
             raise endpoints.ForbiddenException(
-                'You must be the conference organizer to create'
-                'sessions for this conference.'
+                'You must be the conference organizer '
+                'to view users profiles'
             )
 
         # get profile by email from datastore
         profile = Profile.query(Profile.mainEmail == request.mainEmail)
 
-        # verify user profile keys are registered in conference
+        # verify user profile key is registered in conference
         # with conference organizer
         for prof in profile:
             if request.conferenceKey not in prof.conferenceKeysToAttend:
