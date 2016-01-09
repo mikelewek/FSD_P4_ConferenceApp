@@ -15,6 +15,7 @@ __author__ = 'wesc+api@google.com (Wesley Chun)'
 
 from datetime import datetime
 
+import logging
 import endpoints
 from protorpc import messages
 from protorpc import message_types
@@ -39,7 +40,9 @@ from models import Session
 from models import SessionForm
 from models import SessionForms
 from models import EmailForms
+from models import Speaker
 from models import SpeakerForm
+from models import SpeakerForms
 
 from settings import WEB_CLIENT_ID
 from settings import ANDROID_CLIENT_ID
@@ -127,6 +130,11 @@ PROFILE_GET_REQUEST = endpoints.ResourceContainer(
     message_types.VoidMessage,
     mainEmail=messages.StringField(1),
     conferenceKey=messages.StringField(2),
+)
+
+SPEAKER_POST_REQUEST = endpoints.ResourceContainer(
+    message_types.VoidMessage,
+    speakerName=messages.StringField(1, required=True),
 )
 
 SPEAKER_GET_REQUEST = endpoints.ResourceContainer(
@@ -624,7 +632,7 @@ class ConferenceApi(remote.Service):
             raise endpoints.BadRequestException(
                 "Session name is required")
 
-        # verify conference and session exist
+        # verify conference exist
         conf = ndb.Key(urlsafe=request.conferenceKey)
         if not conf:
             raise endpoints.NotFoundException(
@@ -736,8 +744,6 @@ class ConferenceApi(remote.Service):
                     setattr(session_form, field.name, str(getattr(session, field.name)))
                 else:
                     setattr(session_form, field.name, getattr(session, field.name))
-            elif field.name == "websafeKey":
-                    setattr(session_form, field.name, session.key.urlsafe())
             session_form.check_initialized()
         return session_form
 
@@ -757,6 +763,30 @@ class ConferenceApi(remote.Service):
             items=[self._copySessionToForm(sess)
                    for sess in speaker_sessions]
         )
+
+    @endpoints.method(SPEAKER_POST_REQUEST, SpeakerForm,
+                      path='addspeaker',
+                      http_method='POST')
+    def addSpeaker(self, request):
+        """Add speaker"""
+
+        # verify user is authed
+        user = endpoints.get_current_user()
+        if not user:
+            raise endpoints.UnauthorizedException('Authorization required')
+
+        # generate unique id for speaker
+        s_id = Speaker.allocate_ids(size=1)[0]
+        s_key = ndb.Key(Speaker, s_id)
+
+        # save into datastore
+        speaker = Speaker(key=s_key, speakerName=request.speakerName)
+
+        # get speaker urlsafe string
+        speaker_key = speaker.put()
+        s_uss = speaker_key.urlsafe()
+
+        return SpeakerForm(speakerKey=s_uss, speakerName=request.speakerName)
 
     @endpoints.method(SPEAKER_GET_REQUEST, SpeakerForm,
                       path='conference/getfeaturedspeaker/{websafeConferenceKey}',
@@ -780,8 +810,8 @@ class ConferenceApi(remote.Service):
         for field in speaker_form.all_fields():
             if field.name == 'sessionName':
                 setattr(speaker_form, field.name, conf['sessionName'])
-            elif field.name == 'speakerKey':
-                setattr(speaker_form, field.name, conf['speakerKey'])
+            elif field.name == 'speakerName':
+                setattr(speaker_form, field.name, conf['speakerName'])
         speaker_form.check_initialized()
 
         return speaker_form

@@ -46,31 +46,27 @@ class SendConfirmationEmailHandler(webapp2.RequestHandler):
         )
 
 
-class GetFeaturedSpeakerHandler(webapp2.RequestHandler):
+class SetFeaturedSpeakerHandler(webapp2.RequestHandler):
     def post(self):
         """Set featured speaker using memcache"""
         # get sessions by websafeConferenceKey
         conference_key = ndb.Key(urlsafe=self.request.get('websafeConferenceKey'))
         query = Session.query(ancestor=conference_key)
 
-        # loop results checking for speakerKey equal to new speakerKey
+        # loop results checking for speakerName equal to new speakerName
         # set dict memcache if speaker occurs in a session
         session_data = {}
-        session_data['speakerKey'] = self.request.get('speakerKey')
+        session_data['speakerName'] = self.request.get('speakerName')
         session_data['sessionName'] = []
 
-        i = 0
-        for row in query:
-            # set featured speaker if speakerKey exists
-            # add session names to list
-            if row.speakerKey == self.request.get('speakerKey'):
-                session_data['sessionName'].append(row.sessionName)
-                i += 1
+        query = Session.query(ancestor=conference_key)\
+            .filter(Session.speakerKey == self.request.get('speakerKey'))
+        num_sessions = query.count()
 
-        # check if speakerKey dict was set
-        if i > 1:
-            memcache.set(self.request.get('websafeConferenceKey'),
-                         session_data)
+        for q in query:
+            if num_sessions > 1:
+                session_data['sessionName'].append(q.sessionName)
+                memcache.set(self.request.get('websafeConferenceKey'), session_data)
 
         self.response.set_status(204)
 
@@ -78,5 +74,5 @@ class GetFeaturedSpeakerHandler(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/crons/set_announcement', SetAnnouncementHandler),
     ('/tasks/send_confirmation_email', SendConfirmationEmailHandler),
-    ('/tasks/get_featured_speaker', GetFeaturedSpeakerHandler),
+    ('/tasks/get_featured_speaker', SetFeaturedSpeakerHandler),
 ], debug=True)

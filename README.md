@@ -33,9 +33,10 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 
 ###Task #1 - Explanation of Design Choices
 
+#####Notes
 * The Session and SessionForm model and endpoints were created as necessary, utilizing required variables in the project outline.
 * The Session model was set as StringProperty for sessionName, highlights, typeOfSession, and speakerKey properties since they will be inserted and queried as text. DateProperty was used for the date field, TimeProperty for the time field, and integer properties where necessary, so they are in the correct format and will be easy to use as an API user and query. To create a Session, sessionName is set as required.
-* The Session class properties: typeOfSession and speakerKey endpoints were created. A typeOfSession property was added to the Session and SessionForm model which allows the user to insert and sort by type. 
+* The Session class properties: typeOfSession and speakerKey endpoints were created. A typeOfSession property was added to the Session and SessionForm model which allows the user to insert and sort by type. The speakerKey is a user's email address and inserted manully by the API user.
 * An endpoint was created to get all sessions (getConferenceSessions). The CONF_GET_REQUEST is set as the request message class and SessionForm is set as the response message class. Sessions are queried in the datastore using the websafeConferenceKey and a SessionForm message object is returned containing all sessions.
 * The getConferenceSessionsByType - The websafeConferenceKey is queried and returned from the datastore, if it exists. The SessionForms form message is returned as the response message.
 * The getSessionsBySpeaker - Sessions are queried, replicating the previous two functions. They speakerKey StringProperty was added to the Session model.
@@ -44,6 +45,16 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 * The getProfileByEmail endpoint queries a user's profile by email using PROFILE_GET_REQUEST as the request message class and Conferenceform as the response class. 
 * The getFeaturedSpeaker endpoint gets the featured speaker profile if it exists in memcache. A speakerForm model was created to return speakerKey and sessionName list properties.
 * The GetFeaturedSpeakerHandler in main.py is used to set featured speaker tasks by setting it in memcache when a new session object is created in the _createSessionObject utility function. If there is more than one session by a speaker at a conference, a new Memcache entry that features the speaker and session names is inserted for that conference.
+
+#####How the User Should Interact with API to add a Session
+
+1. A user decides that she wants to add a Session to a conference.
+2. She checks out the createSession endpoint and notices that she needs to provide a speakerKey.
+3. She finds the addSpeaker endpoint and inputs the information for a Speaker 'John Smith'.
+4. After submitting the form to addSpeaker she receives a response from the server confirming that a new Speaker object has been created. The Key pointing to the object is a long string which serves as a unique reference. She copies that string.
+5. Returning to the createSession endpoint the user copies the speakerKey string into the form in the appropriate field and fills out the rest of the form.
+6. A task is then set to run, assigning the speaker in memcache if the speaker is set to speak at more than one of the sessions at a conference.
+7. She can then get a conference's featured speaker by using the getFeaturedSpeaker endpoint by inserting the websafeConferenceKey string into the form.
 
 ###Task #2 - Add Session to Wishlist
 Wishlist endpoints were implemented as required. addSessionToWishlist(SessionKey), getSessionsInWishlist(), deleteSessionInWishlist(SessionKey)
