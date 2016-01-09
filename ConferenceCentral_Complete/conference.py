@@ -781,10 +781,13 @@ class ConferenceApi(remote.Service):
 
         # save into datastore
         speaker = Speaker(key=s_key, speakerName=request.speakerName)
+        speaker_key = speaker.put()
 
         # get speaker urlsafe string
-        speaker_key = speaker.put()
         s_uss = speaker_key.urlsafe()
+        if not s_uss:
+            raise endpoints.NotFoundException(
+                'Unable to get speakerKey from Datastore')
 
         return SpeakerForm(speakerKey=s_uss, speakerName=request.speakerName)
 
