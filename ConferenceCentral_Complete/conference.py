@@ -789,7 +789,7 @@ class ConferenceApi(remote.Service):
             raise endpoints.NotFoundException(
                 'Unable to get speakerKey from Datastore')
 
-        return SpeakerForm(speakerKey=s_uss, speakerName=request.speakerName)
+        return SpeakerForm(speakerKey=s_uss)
 
     @endpoints.method(SPEAKER_GET_REQUEST, SpeakerForm,
                       path='conference/getfeaturedspeaker/{websafeConferenceKey}',
