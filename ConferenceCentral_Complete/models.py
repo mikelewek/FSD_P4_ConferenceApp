@@ -158,13 +158,13 @@ class SessionForms(messages.Message):
 
 class Speaker(ndb.Model):
     """Speaker -- Speaker object"""
-    speakerName = ndb.StringProperty(required=True)
-
+    displayName = ndb.StringProperty(required=True)
+    speakerKey  = ndb.StringProperty()
 
 class SpeakerForm(messages.Message):
     """SpeakerForm -- Speaker outbound form message"""
     speakerKey = messages.StringField(1)
-    speakerName = messages.StringField(2)
+    displayName = messages.StringField(2)
     sessionName = messages.StringField(3, repeated=True)
 
 

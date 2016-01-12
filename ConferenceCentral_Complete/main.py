@@ -21,6 +21,7 @@ from google.appengine.api import memcache
 
 from conference import ConferenceApi
 from models import Session
+from models import Speaker
 
 MEMCACHE_SPEAKER_KEY = "FEATURED SPEAKER"
 
@@ -49,25 +50,30 @@ class SendConfirmationEmailHandler(webapp2.RequestHandler):
 class SetFeaturedSpeakerHandler(webapp2.RequestHandler):
     def post(self):
         """Set featured speaker using memcache"""
-        # get sessions by websafeConferenceKey
-        conference_key = ndb.Key(urlsafe=self.request.get('websafeConferenceKey'))
-        query = Session.query(ancestor=conference_key)
 
-        # loop results checking for speakerName equal to new speakerName
+        # set conference_key var to request var
+        conference_key = ndb.Key(urlsafe=self.request.get('websafeConferenceKey'))
+
+        # loop results checking for speakerKey equal to new speakerKey
         # set dict memcache if speaker occurs in a session
         session_data = {}
-        session_data['speakerName'] = self.request.get('speakerName')
         session_data['sessionName'] = []
 
         query = Session.query(ancestor=conference_key)\
             .filter(Session.speakerKey == self.request.get('speakerKey'))
         num_sessions = query.count()
 
+        # get speaker displayName from speaker datastore and set into dict
+        profile = Speaker.query(Speaker.speakerKey == self.request.get('speakerKey'))
+        displayName = profile.get()
+        session_data['displayName'] = displayName
+
         for q in query:
             if num_sessions > 1:
                 session_data['sessionName'].append(q.sessionName)
                 memcache.set(self.request.get('websafeConferenceKey'), session_data)
 
+        logging.info('sdafdsasdfasdfsdfasdf %s', session_data)
         self.response.set_status(204)
 
 

@@ -46,7 +46,7 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 * The getFeaturedSpeaker endpoint gets the featured speaker profile if it exists in memcache. A speakerForm model was created to return speakerKey and sessionName list properties.
 * The GetFeaturedSpeakerHandler in main.py is used to set featured speaker tasks by setting it in memcache when a new session object is created in the _createSessionObject utility function. If there is more than one session by a speaker at a conference, a new Memcache entry that features the speaker and session names is inserted for that conference.
 
-#####How the User Should Interact with API to add a Session
+#####How the User Should Interact with API to Add a Session and Get The Featured Speaker for a Conference
 
 1. A user decides that she wants to add a Session to a conference.
 2. She checks out the createSession endpoint and notices that she needs to provide a speakerKey.
@@ -54,7 +54,7 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 4. After submitting the form to addSpeaker she receives a response from the server confirming that a new Speaker object has been created. The Key pointing to the object is a long string which serves as a unique reference. She copies that string.
 5. Returning to the createSession endpoint the user copies the speakerKey string into the form in the appropriate field and fills out the rest of the form.
 6. A task is then set to run, assigning the speaker in memcache if the speaker is set to speak at more than one of the sessions at a conference.
-7. She can then get a conference's featured speaker by using the getFeaturedSpeaker endpoint by inserting the websafeConferenceKey string into the form.
+7. She can then get a conference's featured speaker by using the getFeaturedSpeaker endpoint by inserting the websafeConferenceKey string into the form. (as long as the same person is assigned the speaker for at least two sessions in a conference)
 
 ###Task #2 - Add Session to Wishlist
 Wishlist endpoints were implemented as required. addSessionToWishlist(SessionKey), getSessionsInWishlist(), deleteSessionInWishlist(SessionKey)

@@ -134,7 +134,7 @@ PROFILE_GET_REQUEST = endpoints.ResourceContainer(
 
 SPEAKER_POST_REQUEST = endpoints.ResourceContainer(
     message_types.VoidMessage,
-    speakerName=messages.StringField(1, required=True),
+    displayName=messages.StringField(1, required=True),
 )
 
 SPEAKER_GET_REQUEST = endpoints.ResourceContainer(
@@ -780,7 +780,7 @@ class ConferenceApi(remote.Service):
         s_key = ndb.Key(Speaker, s_id)
 
         # save into datastore
-        speaker = Speaker(key=s_key, speakerName=request.speakerName)
+        speaker = Speaker(key=s_key, displayName=request.displayName)
         speaker_key = speaker.put()
 
         # get speaker urlsafe string
@@ -813,8 +813,8 @@ class ConferenceApi(remote.Service):
         for field in speaker_form.all_fields():
             if field.name == 'sessionName':
                 setattr(speaker_form, field.name, conf['sessionName'])
-            elif field.name == 'speakerName':
-                setattr(speaker_form, field.name, conf['speakerName'])
+            elif field.name == 'displayName':
+                setattr(speaker_form, field.name, conf['displayName'])
         speaker_form.check_initialized()
 
         return speaker_form
