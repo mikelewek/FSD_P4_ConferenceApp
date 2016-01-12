@@ -676,10 +676,14 @@ class ConferenceApi(remote.Service):
         session_key = ndb.Key(Session, session_id, parent=conf_key)
         data['key'] = session_key
 
+        # get speaker from datastore
+        speaker = ndb.Key(urlsafe=data['speakerKey']).get()
+        speaker_name = speaker.displayName
+
         # verify speaker exists
-        if not data['speakerKey']:
+        if not speaker_name:
             raise endpoints.NotFoundException(
-                'No speakerKey found: %s' % data['speakerKey'])
+                'No speakerKey found: %s' % speaker_name)
 
         # create Session & save to datastore
         sess = Session(**data)
@@ -755,8 +759,7 @@ class ConferenceApi(remote.Service):
         """Get sessions by type with speakerKey"""
 
         speaker_key = request.speakerKey
-        speaker = ndb.Key(urlsafe=speaker_key)
-        speaker_sessions = Session.query(Session.speakerKey == speaker)
+        speaker_sessions = Session.query(Session.speakerKey == request.speakerKey)
 
         return SessionForms(
             items=[self._copySessionToForm(sess)
