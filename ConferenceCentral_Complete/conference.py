@@ -15,7 +15,6 @@ __author__ = 'wesc+api@google.com (Wesley Chun)'
 
 from datetime import datetime
 
-import logging
 import endpoints
 from protorpc import messages
 from protorpc import message_types

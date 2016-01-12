@@ -12,7 +12,6 @@ created by wesc on 2014 may 24
 
 __author__ = 'wesc+api@google.com (Wesley Chun)'
 
-import logging
 import webapp2
 from google.appengine.ext import ndb
 from google.appengine.api import app_identity
@@ -64,16 +63,14 @@ class SetFeaturedSpeakerHandler(webapp2.RequestHandler):
         num_sessions = query.count()
 
         # get speaker displayName from speaker datastore and set into dict
-        profile = Speaker.query(Speaker.speakerKey == self.request.get('speakerKey'))
-        displayName = profile.get()
-        session_data['displayName'] = displayName
+        display_name = ndb.Key(urlsafe=self.request.get('speakerKey')).get()
+        session_data['displayName'] = display_name.displayName
 
         for q in query:
             if num_sessions > 1:
                 session_data['sessionName'].append(q.sessionName)
                 memcache.set(self.request.get('websafeConferenceKey'), session_data)
 
-        logging.info('sdafdsasdfasdfsdfasdf %s', session_data)
         self.response.set_status(204)
 
 
