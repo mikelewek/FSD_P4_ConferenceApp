@@ -691,7 +691,7 @@ class ConferenceApi(remote.Service):
 
         # if speakerKey is set, add the task to the default queue
         if data['speakerKey']:
-            taskqueue.add(url='/tasks/get_featured_speaker',
+            taskqueue.add(url='/tasks/set_featured_speaker',
                           params={'websafeConferenceKey': request.conferenceKey,
                                   'speakerKey': data['speakerKey']})
 
