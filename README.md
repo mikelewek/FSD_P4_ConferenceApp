@@ -71,7 +71,7 @@ Two additional queries added:
 
 ###Task #4 - Implement getFeaturedSpeaker()
 
-The endpoint retrieves a conference's featured speaker set in memcache from the GetFeaturedSpeaker task. Featured Speaker key is the user's email address. When a session is inserted, the task is run. It checks to see if the user is a speaker at any of the other conference sessions. If so, the memcache key is saved for the conference key and stores the user's speakerKey and session names. They are returned in the getFeaturedSpeaker endpoint.
+The endpoint retrieves a conference's featured speaker set in memcache from the SetFeaturedSpeaker task. Featured Speaker key is the user's email address. When a session is inserted, the task is run. It checks to see if the user is a speaker at any of the other conference sessions. If so, the memcache key is saved for the conference key and stores the user's speakerKey and session names. They are returned in the getFeaturedSpeaker endpoint.
 
 ###Task #5 - Query Related Problem
 
