@@ -54,7 +54,7 @@ This application uses Google Cloud API's, OAuth, and Endpoints for a Conference 
 4. After submitting the form to addSpeaker she receives a response from the server confirming that a new Speaker object has been created. The Key pointing to the object is a long string which serves as a unique reference. She copies that string.
 5. Returning to the createSession endpoint the user copies the speakerKey string into the form in the appropriate field and fills out the rest of the form.
 6. A task is then set to run, assigning the speaker in memcache if the speaker is set to speak at more than one of the sessions at a conference.
-7. She can then get a conference's featured speaker by using the getFeaturedSpeaker endpoint by inserting the websafeConferenceKey string into the form. (as long as the same person is assigned the speaker for at least two sessions in a conference)
+7. She can then get a conference's featured speaker by using the getFeaturedSpeaker endpoint by inserting the websafeConferenceKey string into the form. (as long as the same person is assigned the speaker for at least two sessions in a conference and the memcache has been set)
 
 ###Task #2 - Add Session to Wishlist
 Wishlist endpoints were implemented as required. addSessionToWishlist(SessionKey), getSessionsInWishlist(), deleteSessionInWishlist(SessionKey)
