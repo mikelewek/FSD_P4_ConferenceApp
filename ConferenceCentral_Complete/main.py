@@ -66,10 +66,10 @@ class SetFeaturedSpeakerHandler(webapp2.RequestHandler):
         display_name = ndb.Key(urlsafe=self.request.get('speakerKey')).get()
         session_data['displayName'] = display_name.displayName
 
-        for q in query:
-            if num_sessions > 1:
+        if num_sessions > 1:
+            for q in query:
                 session_data['sessionName'].append(q.sessionName)
-                memcache.set(self.request.get('websafeConferenceKey'), session_data)
+            memcache.set(self.request.get('websafeConferenceKey'), session_data)
 
         self.response.set_status(204)
 

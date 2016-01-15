@@ -676,14 +676,12 @@ class ConferenceApi(remote.Service):
         session_key = ndb.Key(Session, session_id, parent=conf_key)
         data['key'] = session_key
 
-        # get speaker from datastore
-        speaker = ndb.Key(urlsafe=data['speakerKey']).get()
-        speaker_name = speaker.displayName
-
         # verify speaker exists
-        if not speaker_name:
-            raise endpoints.NotFoundException(
-                'No speakerKey found: %s' % speaker_name)
+        speaker = ndb.Key(urlsafe=data['speakerKey']).get()
+        if not speaker:
+            raise endpoints.NotFoundException('No speaker found with key: %s' % data['speakerKey'])
+
+        speaker_name = speaker.displayName
 
         # create Session & save to datastore
         sess = Session(**data)
@@ -747,6 +745,8 @@ class ConferenceApi(remote.Service):
                     setattr(session_form, field.name, str(getattr(session, field.name)))
                 else:
                     setattr(session_form, field.name, getattr(session, field.name))
+
+            session_form.websafeKey = session.key.urlsafe()
             session_form.check_initialized()
         return session_form
 
@@ -795,7 +795,7 @@ class ConferenceApi(remote.Service):
 
     @endpoints.method(SPEAKER_GET_REQUEST, SpeakerForm,
                       path='conference/getfeaturedspeaker/{websafeConferenceKey}',
-                      http_method='POST')
+                      http_method='GET')
     def getFeaturedSpeaker(self, request):
         """Get featured speaker from memcache"""
 
