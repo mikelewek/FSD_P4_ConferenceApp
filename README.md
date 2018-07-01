@@ -73,7 +73,7 @@ Two additional queries added:
 
 The endpoint retrieves a conference's featured speaker set in memcache from the SetFeaturedSpeaker task. Featured Speaker key is the user's email address. When a session is inserted, the task is run. It checks to see if the user is a speaker at any of the other conference sessions. If so, the memcache key is saved for the conference key and stores the user's speakerKey and session names. They are returned in the getFeaturedSpeaker endpoint.
 
-###Task #5 - Query Related Problem
+### Task #5 - Query Related Problem
 
 There is an issue because you want to query two properties. As stated in the documentation, you are limited to filtering one property at a time: [Inequality filters are limited to at most one property](https://cloud.google.com/appengine/docs/python/datastore/queries?hl=en#Python_Restrictions_on_queries)
 * Solving this could be to query and filter one property, then iterate the results and remove the second query 'manually' in a loop.
